@@ -2,7 +2,7 @@ import mongoose,{Schema} from "mongoose";
 
 const applicationSchema = new Schema({
     job_id:{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Job',
         required: [true,"job id needed to apply for a job"],
     },

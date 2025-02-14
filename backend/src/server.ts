@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import authRouter from "./routes/authRoutes.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import dbConnection from "./config/db.js";
+import jobRouter from "./routes/jobRoutes.js";
+import jwtVerify from "./middlewares/authMiddleware.js";
 
 const app = express();
 dotenv.config();
@@ -14,11 +16,14 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
+
 // routes
-app.get("/api/home", (req: Request, res: Response) => {
-  res.send("Home");
-});
+
+// app.get("/api/home", (req: Request, res: Response) => {
+//   res.send("Home");
+// });
 app.use("/api/auth", authRouter);
+app.use('/api/jobs',jobRouter);
 
 
 // server
