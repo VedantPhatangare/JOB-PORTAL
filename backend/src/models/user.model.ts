@@ -42,7 +42,6 @@ const userSchema:Schema<userType> = new mongoose.Schema(
         ref:'Job'
       }]
     },
-
     {timestamps: true}
 )
 

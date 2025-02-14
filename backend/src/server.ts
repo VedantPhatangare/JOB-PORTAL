@@ -7,6 +7,7 @@ import errorMiddleware from "./middlewares/errorMiddleware.js";
 import dbConnection from "./config/db.js";
 import jobRouter from "./routes/jobRoutes.js";
 import jwtVerify from "./middlewares/authMiddleware.js";
+import applicationRouter from "./routes/applyRoutes.js";
 
 const app = express();
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(morgan("dev"));
 // });
 app.use("/api/auth", authRouter);
 app.use('/api/jobs',jobRouter);
+app.use('/api/application',applicationRouter);
 
 
 // server

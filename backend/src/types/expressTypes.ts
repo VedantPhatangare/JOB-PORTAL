@@ -1,4 +1,4 @@
-import { UserPayload } from "./userPayload.js";
+import { UserPayload } from "./reqTypes.js"
 
 declare module 'express'{
     export interface Request{

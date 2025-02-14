@@ -13,6 +13,7 @@ export const registerUser =asyncHandler(async(req:Request,res:Response,next:Next
     const newUser = new User({
         name,email,password:hashedPass,role
     })
+    
     await newUser.save();
 
     res.status(201).json({message:"User registered successfully"});

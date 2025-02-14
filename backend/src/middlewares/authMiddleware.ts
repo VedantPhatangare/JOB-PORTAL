@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt  from "jsonwebtoken";
-import { UserPayload } from "../types/userPayload.js";
+import { UserPayload } from "../types/reqTypes.js";
 const jwtVerify = (req:Request, res:Response, next:NextFunction):void=>{
     const token = req.headers.authorization?.split(" ")[1];
     if(!token){
@@ -9,8 +9,10 @@ const jwtVerify = (req:Request, res:Response, next:NextFunction):void=>{
     }
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!); 
-      req.user= decoded as UserPayload;
-      next(); 
+      req.user = decoded as UserPayload;
+      console.log(req.user);
+      
+      next();
     } catch (error) {
         res.status(401).json({message:"Unauthorized access, invalid token"});
         return;

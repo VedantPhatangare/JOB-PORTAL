@@ -6,7 +6,7 @@ const applicationSchema = new Schema({
         ref: 'Job',
         required: [true,"job id needed to apply for a job"],
     },
-    user_id:{
+    applicant_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'User',
         required: true,
