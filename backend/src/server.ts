@@ -23,9 +23,9 @@ app.use(morgan("dev"));
 app.use('/getresume/', express.static(resumePath))
 
 // routes
-// app.use("/home",(req,res)=>{
-//   res.send("hi")
-// })
+app.get("/api/test",(req,res)=>{
+  res.json({message:"test success"})
+})
 app.use("/api/auth", authRouter);
 app.use('/api/jobs',jobRouter);
 app.use('/api/application',applicationRouter);
@@ -42,6 +42,7 @@ dbConnection()
   })
   .catch((err) => {console.log(err);
   });
+
 
 // error middleware
 app.use(errorMiddleware);
