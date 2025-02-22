@@ -7,6 +7,7 @@ import Signup from './pages/Signup'
 import Home from './pages/Home'
 import { Provider } from 'react-redux'
 import store from './app/Store'
+import JobDescription from './Components/JobDescription'
 
 const Router  = createBrowserRouter([
     {
@@ -25,6 +26,11 @@ const Router  = createBrowserRouter([
         {
           path:"/signup",
           element:<Signup/>
+        },
+        {
+          path:"/job/:job_id",
+          // loader: Jobloader,
+          element:<JobDescription/>
         }
       ]
     }
