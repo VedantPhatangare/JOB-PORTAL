@@ -17,8 +17,8 @@ const resumePath = path.join(__dirnam,"../uploads");
 // console.log(resumePath);
 
 // middlewares
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use(morgan("dev"));
 app.use('/getresume/', express.static(resumePath))
 

@@ -1,3 +1,3 @@
 export interface applyStatus{
-    status: ["Accepted","Rejected"];
+    status: "Accepted" | "Rejected"
 }

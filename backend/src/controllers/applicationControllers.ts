@@ -3,7 +3,6 @@ import asyncHandler from "../utils/asyncHandler.js";
 import Job from "../models/job.model.js";
 import Application from "../models/application.model.js";
 import { applyStatus } from "../types/applicationTypes.js";
-import path from "path";
 
 export const apply = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {job_id} = req.params;

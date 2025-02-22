@@ -5,6 +5,6 @@ import jwtVerify from "../middlewares/authMiddleware.js";
 const jobRouter:Router = express.Router();
 
 jobRouter.post("/create",jwtVerify, createJob)
-jobRouter.get("/getall", getJobs)
+jobRouter.get("/getjobs", getJobs)
 
 export default jobRouter;
