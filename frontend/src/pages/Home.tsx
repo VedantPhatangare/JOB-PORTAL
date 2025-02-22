@@ -2,12 +2,17 @@ import { useEffect, useState } from "react"
 import Jobcard from "../Components/Jobcard"
 import { JobcardProps } from "../utils/types"
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setJobs } from "../features/Jobslice";
+import { Appdispatch } from "../app/Store";
 
 const Home:React.FC=()=>{   
-    const [jobs, setjobs] = useState([]);
+    const dispatch = useDispatch<Appdispatch>()
+    const [jobs, setjobs] = useState<JobcardProps[]>([]);
     const getJobs = async()=>{
         const response= await axios.get('http://127.0.0.1:5000/api/jobs/getjobs');
-        setjobs(response.data.jobs)
+        setjobs(response.data.jobs);
+        dispatch(setJobs(response.data.jobs));
     }
     useEffect(() => {
         getJobs();
@@ -21,7 +26,7 @@ const Home:React.FC=()=>{
                 {
                     jobs?
                     jobs.map((job:JobcardProps)=>
-                        <Jobcard {...job}/>
+                        <Jobcard key={job._id} {...job}/>
                     )
                     : "No Jobs"
                 }
