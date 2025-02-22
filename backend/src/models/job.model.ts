@@ -1,6 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { Document,Schema } from "mongoose";
 
-const jobSchema = new mongoose.Schema(
+interface jobType extends Document{
+  title: string,
+  description: string,
+  company: string,
+  location: string,
+  salary: number,
+  jobtype: "Full-time"| "Part-time" | "Contract" | "Internship",
+  postedBy: {name: string, id: string},
+  applicants: Array<{appl_id:string}>
+}
+
+const jobSchema:Schema<jobType> = new mongoose.Schema(
    {
         
         title:{
@@ -27,8 +38,7 @@ const jobSchema = new mongoose.Schema(
             type: String, enum:["Full-time","Part-time","Contract","Internship"],required: true
         },
         postedBy:{ 
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'User', 
+            type: Object,
             required: true
         },
         applicants:[{
