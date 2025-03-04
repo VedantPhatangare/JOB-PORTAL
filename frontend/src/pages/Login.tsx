@@ -8,7 +8,8 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
-  const role = (searchParams.get('role') as "Recruiter" )|| "Candidate"
+  const [loader, setloader] = useState<boolean>(false);
+  const role = (searchParams.get('role') as "Recruiter" )|| "Candidate";
   const [form, setform] = useState({ email: "", password: "" });
   const [error, seterror] = useState("");
 
@@ -19,11 +20,13 @@ const Login = () => {
 
   const handlelogin = async (e: React.FormEvent<HTMLFormElement>,role:"Candidate" | "Recruiter") => {
     e.preventDefault();
+    setloader(true);
     try {
       let response = await axios.post(
         "http://127.0.0.1:5000/api/auth/login",
         {...form,role}
       );
+      setloader(false);
       console.log(response.data);
       const { token } = response.data;
       localStorage.setItem("token", token);
@@ -34,15 +37,24 @@ const Login = () => {
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data.message || "error occured");
         seterror(error.response?.data.message || "error occured");
+        setloader(false);
       } else {
         console.log("Unexpected error:", error);
         setform({ email: "", password: "" });
+        setloader(false);
       }
     }
   };
 
   return (
-    <div className="h-[64vh] w-[25vw] mt-[10vh] rounded-xl bg-white flex flex-col items-center p-2">
+    <div className=" h-[64vh] w-[25vw] mt-[10vh] rounded-xl bg-white flex flex-col items-center p-2">
+      {
+        loader && <div 
+        className="absolute z-10 bottom-22 left-0 h-[100%] w-[100%] flex justify-center items-center">
+            <div className="w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
+        </div>
+      }
+      
       <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
         {role =="Recruiter"?"Recruiter Login":"Candidate Login"}
       </div>
