@@ -26,9 +26,9 @@ const Jobcard: React.FC<JobcardProps> = ({_id,title,company,location,salary,jobt
         </div>
       </div>
 
-      <div className="flex flex-row gap-4 w-full text-sm text-neutral-950 items-center">
-        <span className="bg-gray-200 p-1 rounded-sm">{jobtype}</span>
-        <div className="bg-gray-200 p-1 rounded-sm">posted by {postedBy.name}</div>
+      <div className="flex flex-row gap-4 w-full text-sm items-center">
+        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md">{jobtype}</span>
+        <div className="bg-green-100 text-black px-2 py-1 rounded-md">posted by {postedBy.name}</div>
       </div>
 
     </div>

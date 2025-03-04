@@ -12,7 +12,7 @@ export const apply = asyncHandler(async(req:Request,res:Response,next:NextFuncti
     }
     const files = req.files as  { [fieldname: string]: Express.Multer.File[] } | undefined;
     const resume = files?.resume[0].path;
-    console.log(resume);
+    // console.log(resume);
     
     const coverletter = files?.coverletter?.[0].path;
 
