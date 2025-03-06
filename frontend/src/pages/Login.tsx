@@ -47,13 +47,15 @@ const Login = () => {
   };
 
   return (
-    <div className=" h-[64vh] w-[25vw] mt-[10vh] rounded-xl bg-white flex flex-col items-center p-2">
+    <div className="relative w-full h-full z-10">
       {
         loader && <div 
-        className="absolute z-10 bottom-22 left-0 h-[100%] w-[100%] flex justify-center items-center">
-            <div className="w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
+        className="absolute z-10 h-full w-full flex justify-center items-center">
+          <div className="absolute h-full w-full bg-blue-200 opacity-20"></div>
+            <div className="relative z-20 bottom-18 w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
         </div>
       }
+    <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-xl bg-white flex flex-col items-center p-2">
       
       <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
         {role =="Recruiter"?"Recruiter Login":"Candidate Login"}
@@ -107,6 +109,7 @@ const Login = () => {
         </span>
       </div>
       <span>or</span>
+    </div>
     </div>
   );
 };
