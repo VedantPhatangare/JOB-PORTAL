@@ -1,4 +1,4 @@
-import mongoose, { Document,Schema } from "mongoose";
+import mongoose, { Date, Document,Schema } from "mongoose";
 
 interface jobType extends Document{
   title: string,
@@ -8,6 +8,7 @@ interface jobType extends Document{
   salary: number,
   jobtype: "Full-time"| "Part-time" | "Contract" | "Internship",
   postedBy: {name: string, id: string},
+  createdBy:Date,
   applicants: Array<{appl_id:string}>
 }
 
