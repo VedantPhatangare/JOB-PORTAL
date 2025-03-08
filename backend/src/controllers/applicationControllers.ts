@@ -7,6 +7,7 @@ import { applyStatus } from "../types/applicationTypes.js";
 export const apply = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const {job_id} = req.params;
     const applicant_id = req.user?.id;
+    if(req.user?.role=="Recruiter") return res.status(400).json({message:"please login as a candidate to apply"})
     if(! req.files){
         return res.status(400).json({message:"Resume is required to apply for a job"})
     }
