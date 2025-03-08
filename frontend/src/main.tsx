@@ -9,6 +9,7 @@ import { Provider } from 'react-redux'
 import store, { persistor } from './app/Store'
 import JobDescription from './Components/JobDescription/JobDescription'
 import { PersistGate } from 'redux-persist/integration/react'
+import RecruiterHome from './pages/RecruiterHome'
 
 const Router  = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ const Router  = createBrowserRouter([
         {
           path:'/',
           element:<Home/>
+        },
+        {
+          path:"/recruiterhome",
+          element:<RecruiterHome/>
         }
         ,
         {

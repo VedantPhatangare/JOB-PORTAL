@@ -30,7 +30,11 @@ const Login = () => {
       console.log(response.data);
       const { token } = response.data;
       localStorage.setItem("token", token);
-      navigate("/");
+      if(role=="Candidate"){
+        navigate("/");
+      }else{
+        navigate("/recruiterhome")
+      }
       dispatch(login());
       setform({ email: "", password: "" });
     } catch (error) {
