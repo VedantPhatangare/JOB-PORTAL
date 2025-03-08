@@ -3,7 +3,7 @@ import { RootState } from "../../app/Store";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { JobcardProps } from "../../utils/types";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import "./jdstyles.css";
 import { HiCash } from "react-icons/hi";
@@ -24,7 +24,8 @@ const JobDescription = () => {
 
   const [resume, setresume] = useState<File | null>(null);
   const [coverletter, setcoverletter] = useState<File | null>(null);
-  const [error, seterror] = useState("");
+  const [ShowError, SetShowError] = useState("");
+  const repeatError = useRef<HTMLDivElement>(null);
   const [message, setmessage] = useState("");
 
   const handleApply = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,9 +34,10 @@ const JobDescription = () => {
     const token = localStorage.getItem("token");
     if (resume) formdata.append("resume", resume);
     if (coverletter) formdata.append("coverletter", coverletter);
-    
+
     try {
-      
+      if (!resume) throw new Error("Resume Required !");
+
       let response = await axios.post(
         `http://127.0.0.1:5000/api/application/${job_id?.split(":")[1]}/apply`,
         formdata,
@@ -46,21 +48,35 @@ const JobDescription = () => {
           },
         }
       );
-      setmessage(response?.data.message)
+      setmessage(response?.data.message);
       console.log(response?.data.message, response?.data.application);
       setresume(null);
       setcoverletter(null);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data.message);
-        seterror(error.response?.data.message);
+        SetShowError(error.response?.data.message);
+        setresume(null);
+        setcoverletter(null);
+      } else if (error instanceof Error) {
+        console.log("error occured:", error);
+        if (!ShowError) {
+          SetShowError(error.message);
+        } else {
+          if(repeatError.current){
+            repeatError.current.classList.add("flash");
+            setTimeout(() => {
+              repeatError.current?.classList.remove("flash");
+          }, 500);
+          }
+        }
         setresume(null);
         setcoverletter(null);
       } else {
         console.log("error occured:", error);
         setresume(null);
         setcoverletter(null);
-        // seterror(error.response?.data.message)
+        SetShowError("Error occured");
       }
     }
   };
@@ -125,7 +141,7 @@ const JobDescription = () => {
       </div>
       <div className=" w-[30%] flex justify-center p-14">
         <form
-          action=""
+          // action=""
           onSubmit={handleApply}
           className="flex flex-col justify-center items-center w-full gap-4"
         >
@@ -133,11 +149,11 @@ const JobDescription = () => {
             type="file"
             name="resume"
             id="resume"
-            required
             className="hidden"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setresume(e.target.files?.[0] || null)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setresume(e.target.files?.[0] || null);
+              SetShowError("");
+            }}
           />
           <label
             htmlFor="resume"
@@ -150,18 +166,24 @@ const JobDescription = () => {
             name="coverletter"
             id="coverletter"
             className="hidden"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setcoverletter(e.target.files?.[0] || null)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setcoverletter(e.target.files?.[0] || null);
+              SetShowError("");
+            }}
           />
           <label
             htmlFor="coverletter"
-            className="cursor-pointer bg-blue-400 text-white px-4 py-2 w-full rounded-md hover:bg-blue-500 transition-colors self-start"
+            className="cursor-pointer bg-black text-white px-4 py-2 w-full rounded-md hover:bg-gray-600  transition-colors self-start"
           >
             {coverletter ? coverletter.name : "Upload Coverletter"}
           </label>
-          {error ? (
-            <div className="text-red-500 text-sm self-start px-2">{error}</div>
+          {ShowError ? (
+            <div
+              ref={repeatError}
+              className="text-red-500 text-sm self-start px-2"
+            >
+              {ShowError}
+            </div>
           ) : (
             ""
           )}
@@ -171,11 +193,7 @@ const JobDescription = () => {
           >
             Apply
           </button>
-          {
-            message?<div>
-              {message}
-            </div>:""
-          }
+          {message ? <div>{message}</div> : ""}
         </form>
       </div>
     </div>

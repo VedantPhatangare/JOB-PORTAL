@@ -2,5 +2,21 @@
 
 /* styles.css */
 .input-style {
-    @apply p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer;
+  @apply p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer;
+}
+
+.flash {
+  animation: flashAnim 0.5s ease-in-out;
+}
+
+@keyframes flashAnim {
+  0% {
+    background-color: inherit;
   }
+  50% {
+    background-color: #ffc0cb;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
