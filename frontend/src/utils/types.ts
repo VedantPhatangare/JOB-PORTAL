@@ -7,4 +7,5 @@ export interface JobcardProps {
     salary: string;
     jobtype: string;
     postedBy: {name:string, id:string};
+    createdAt?:Date
   }
