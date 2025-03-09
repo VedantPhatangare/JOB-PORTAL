@@ -22,7 +22,7 @@ const Navbar = () => {
     navigate("/login");
   };
   return (
-    <div className="h-[8vh] w-full flex bg-white items-center justify-between p-2">
+    <div className="sticky top-0 h-[8vh] z-20 w-full flex bg-white items-center justify-between p-2">
       <div className="logo w-[15%] text-center p-6 cursor-pointer" onClick={()=>navigate("/")}>
         <img src="/portaLogo.png" alt="logo" />
       </div>
