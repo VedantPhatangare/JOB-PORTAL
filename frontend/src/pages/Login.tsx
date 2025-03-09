@@ -33,7 +33,8 @@ const Login = () => {
       if(role=="Candidate"){
         navigate("/");
       }else{
-        navigate("/recruiterhome")
+        const {rec_id} = response.data
+        navigate(`/recruiterhome?id=${rec_id}`)
       }
       dispatch(login());
       setform({ email: "", password: "" });
