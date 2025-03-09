@@ -52,7 +52,7 @@ const Login = () => {
   };
 
   return (
-    <div className="relative w-full h-full z-10">
+    <div className="relative w-full h-[90vh] z-10">
       {
         loader && <div 
         className="absolute z-10 h-full w-full flex justify-center items-center">

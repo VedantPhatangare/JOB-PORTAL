@@ -36,7 +36,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="relative w-[25%] mt-20 rounded-xl bg-white flex flex-col items-center p-2">
+    <div className="relative w-[25%] h-[90vh]">
+      <div className="relative mt-20 rounded-xl bg-white flex flex-col items-center p-2">
       <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
         SignUp
       </div>
@@ -97,6 +98,7 @@ const Signup = () => {
       </div>
       </div>
       
+      </div>
     </div>
   );
 };
