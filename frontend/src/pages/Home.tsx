@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Jobcard from "../Components/Jobcard"
+import Jobcard from "../Components/JobCard/Jobcard"
 import { JobcardProps } from "../utils/types"
 import axios from "axios";
 import { useDispatch } from "react-redux";

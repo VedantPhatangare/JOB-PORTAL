@@ -1,5 +1,4 @@
 import { IoIosSearch } from "react-icons/io";
-import "./Navstyles.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector,useDispatch } from "react-redux";
 import { RootState } from "../../app/Store";
@@ -26,7 +25,7 @@ const Navbar = () => {
       <div className="logo w-[15%] text-center p-6 cursor-pointer" onClick={()=>navigate("/")}>
         <img src="/portaLogo.png" alt="logo" />
       </div>
-      <div className="flex w-[50%] bg-white h-[90%] border border-gray-400 rounded-sm py-1 px-2">
+      <div className="flex w-[50%] bg-white h-[90%] border border-gray-400 rounded-2xl py-1 px-2">
         <IoIosSearch className="h-full w-[3%]" />
         <input
           type="text"
@@ -47,13 +46,13 @@ const Navbar = () => {
           <div className="flex gap-8 w-full h-full">
             <button
               onClick={CandidateNav}
-              className="bg-blue-500 py-1 px-2 h-[95%] rounded-sm flex justify-center items-center text-amber-50 cursor-pointer"
+              className="bg-blue-500 py-1 px-2 h-[95%] rounded-sm flex justify-center items-center text-amber-50 cursor-pointer hover:bg-blue-300 hover:text-black transition-all duration-300"
             >
               Candidates login
             </button>
             <button
             onClick={RecruiterNav} 
-            className="bg-purple-500 py-1 px-2  h-[95%] rounded-sm flex justify-center items-center text-amber-50 cursor-pointer">
+            className="bg-purple-500 py-1 px-2  h-[95%] rounded-sm flex justify-center items-center text-amber-50 cursor-pointer hover:bg-purple-300 hover:text-black transition-all duration-300">
               Recruiters login
             </button>
           </div>

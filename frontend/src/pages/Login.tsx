@@ -60,7 +60,7 @@ const Login = () => {
             <div className="relative z-20 bottom-18 w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
         </div>
       }
-    <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-xl bg-white flex flex-col items-center p-2">
+    <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-xl bg-white shadow-lg hover:shadow-none transition-all flex flex-col items-center p-2">
       
       <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
         {role =="Recruiter"?"Recruiter Login":"Candidate Login"}
