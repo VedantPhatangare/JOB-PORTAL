@@ -1,4 +1,4 @@
-import { JobcardProps } from "../utils/types";
+import { JobcardProps } from "../../utils/types";
 import { FaLocationDot } from "react-icons/fa6";
 import { HiCash } from "react-icons/hi";
 import { MdArrowForwardIos } from "react-icons/md";
@@ -6,17 +6,18 @@ import { useNavigate } from "react-router-dom";
 const Jobcard: React.FC<JobcardProps> = ({_id,title,company,location,salary,jobtype,postedBy}) => {
   const navigate = useNavigate()
   return (
-    <div className="flex flex-col justify-center items-center w-full h-[25%] rounded-xl bg-white p-2 mt-2 mb-2 font-light text-[#6d6c6c]">
+    <div className="flex flex-col justify-center items-center w-full h-[25%] rounded-xl bg-gray-50 p-2 mt-2 mb-2  cursor-pointer hover:bg-white transition-all hover:scale-[1.03] shadow-md hover:shadow-lg"
+    onClick={()=>navigate(`/job/:${_id}`)}>
       
       <div className="flex flex-col mb-2 justify-center w-full">
         <div className="flex justify-between text-xl font-semibold text-gray-900">
         <p>{title}</p>
-        <MdArrowForwardIos className="cursor-pointer fill-green-800 size-5" onClick={()=>navigate(`/job/:${_id}`)}/>
+        <MdArrowForwardIos className="cursor-pointer fill-green-800 size-5" />
         </div>
-        <span className="text-md">{company}</span>
+        <span className="text-md text-gray-600">{company}</span>
       </div>
       <div className=" mb-2 flex flex-col justify-center w-full">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-gray-600">
           <FaLocationDot />
           <p>{location}</p>
         </div>
