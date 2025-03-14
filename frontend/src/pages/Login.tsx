@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -9,7 +9,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [loader, setloader] = useState<boolean>(false);
-  const role = (searchParams.get('role') as "Recruiter" )|| "Candidate";
+  const role = (searchParams.get('role') as "Recruiter" || null );
   const [form, setform] = useState({ email: "", password: "" });
   const [error, seterror] = useState("");
 
@@ -18,7 +18,7 @@ const Login = () => {
     setform((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlelogin = async (e: React.FormEvent<HTMLFormElement>,role:"Candidate" | "Recruiter") => {
+  const handlelogin = async (e: React.FormEvent<HTMLFormElement>,role:"Recruiter" | null) => {
     e.preventDefault();
     setloader(true);
     try {
@@ -30,11 +30,11 @@ const Login = () => {
       console.log(response.data);
       const { token } = response.data;
       localStorage.setItem("token", token);
-      if(role=="Candidate"){
-        navigate("/");
-      }else{
+      if(role){
         const {rec_id} = response.data
         navigate(`/recruiterhome?id=${rec_id}`)
+      }else{
+        navigate("/");
       }
       dispatch(login());
       setform({ email: "", password: "" });
@@ -107,7 +107,7 @@ const Login = () => {
         <span
           className="text-blue-500 cursor-pointer"
           onClick={() =>{
-            navigate("/signup");
+            role? navigate("/signup?role=Recruiter"): navigate("/signup?role=Candidate");
           }}
         >
           SignUp
