@@ -99,28 +99,32 @@ const Navbar = () => {
               SignUp
             </button>
             <button
+            onMouseOver={()=>setisOpen(!isOpen)}
               onClick={() => {
                 if (!isOpen) {
                   setisOpen((prev) => !prev);
                 } else {
                   if (loginRef.current)
                     loginRef.current.classList.add("slide-up");
-                  setTimeout(() => {
-                    setisOpen(false);
-                    if (loginRef.current) loginRef.current.classList.remove("slide-up");
-                  }, 200);
+                  delayAnim()
                 }
               }}
               className="bg-black py-1.5 px-4 tracking-wide rounded-sm flex justify-center items-center gap-2 text-white font-medium cursor-pointer hover:bg-gray-800 transition-color duration-300 keep-open"
             >
               Login <FaAngleRight 
-              className="transition-all"
+              className={`transition-all duration-200 ${isOpen?"rotate-90 ":""}`}
               />
             </button>
             {isOpen && (
               <div
                 ref={loginRef}
-                className={`absolute  flex flex-wrap justify-center items-center gap-2 top-12 left-20 p-1 bg-white py-2 border border-gray-100 $ slide-down`}
+                className={`absolute  flex flex-wrap justify-center items-center gap-2 top-12 left-20 px-4 pb-4 bg-gray-50 py-2 border border-gray-100 $ slide-down`}
+                
+            onMouseLeave={()=>{
+              if (loginRef.current)
+                loginRef.current.classList.add("slide-up");
+              delayAnim()
+            }}
               >
                 <button
                   onClick={() => {
