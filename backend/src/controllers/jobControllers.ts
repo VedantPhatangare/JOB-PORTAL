@@ -2,8 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import Job from "../models/job.model.js";
 import User from "../models/user.model.js";
+import { it } from "node:test";
 
 export const createJob = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+        console.log(req.body)
         const {title,description,company,location,salary,jobtype} = req.body
         const id= req.user?.id
         const user = await User.findOne({_id:id})
@@ -19,4 +21,4 @@ export const getJobs = asyncHandler(async(req:Request,res:Response,next:NextFunc
         const jobs = await Job.find();
         res.status(201).json({message:"Jobs fetched successfully",jobs});
         return;
-});
+});      

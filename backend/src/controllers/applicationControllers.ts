@@ -60,7 +60,7 @@ export const getApplicants = asyncHandler(async(req:Request,res:Response,next:Ne
     if(role != 'Recruiter'){
         return res.status(401).json({message:"please login as a recruiter"})
     }
-    const applications = await Application.findById({_id:job_id});
+    const applications = await Application.find({job_id});
     return res.status(201).json({message:"applications fetched succesfully",applications})
 });
 
