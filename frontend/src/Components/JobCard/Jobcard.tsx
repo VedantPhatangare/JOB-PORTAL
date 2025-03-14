@@ -6,11 +6,11 @@ import { useNavigate } from "react-router-dom";
 const Jobcard: React.FC<JobcardProps> = ({_id,title,company,location,salary,jobtype,postedBy}) => {
   const navigate = useNavigate()
   return (
-    <div className="flex flex-col justify-center items-center w-full h-[25%] rounded-xl bg-gray-50 p-2 mt-2 mb-2  cursor-pointer hover:bg-white transition-all hover:scale-[1.03] shadow-md hover:shadow-lg"
+    <div className="flex flex-col justify-center items-center w-full h-[25%] rounded-xl bg-gray-50 p-2 mt-2 mb-2  cursor-pointer hover:bg-white transition-all hover:scale-[1.02] shadow-sm"
     onClick={()=>navigate(`/job/:${_id}`)}>
       
       <div className="flex flex-col mb-2 justify-center w-full">
-        <div className="flex justify-between text-xl font-semibold text-gray-900">
+        <div className="flex justify-between text-xl font-medium text-gray-900">
         <p>{title}</p>
         <MdArrowForwardIos className="cursor-pointer fill-green-800 size-5" />
         </div>
@@ -21,15 +21,15 @@ const Jobcard: React.FC<JobcardProps> = ({_id,title,company,location,salary,jobt
           <FaLocationDot />
           <p>{location}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-gray-600">
           <HiCash />
           <p>{salary} lpa</p>
         </div>
       </div>
 
       <div className="flex flex-row gap-4 w-full text-sm items-center">
-        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md">{jobtype}</span>
-        <div className="bg-green-100 text-black px-2 py-1 rounded-md">posted by {postedBy.name}</div>
+        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md">{jobtype}</span>
+        <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md">posted by {postedBy.name}</div>
       </div>
 
     </div>

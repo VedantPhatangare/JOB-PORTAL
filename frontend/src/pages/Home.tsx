@@ -12,7 +12,6 @@ const Home:React.FC=()=>{
     const getJobs = async()=>{
         const response= await axios.get('http://127.0.0.1:5000/api/jobs/getjobs');
         console.log(response);
-        
         setjobs(response.data.jobs);
         dispatch(setJobs(response.data.jobs));
     }

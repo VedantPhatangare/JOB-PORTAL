@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -60,7 +60,7 @@ const Login = () => {
             <div className="relative z-20 bottom-18 w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
         </div>
       }
-    <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-xl bg-white shadow-lg hover:shadow-none transition-all flex flex-col items-center p-2">
+    <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-xl bg-white shadow-sm hover:shadow-none transition-all flex flex-col items-center p-2">
       
       <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
         {role =="Recruiter"?"Recruiter Login":"Candidate Login"}
@@ -75,7 +75,7 @@ const Login = () => {
           value={form.email}
           onChange={handleChange}
           required
-          className="w-full outline-none px-2 py-1.5 border rounded-sm border-gray-400"
+          className="w-full form-input"
           placeholder="email"
         />
         <input
@@ -84,7 +84,7 @@ const Login = () => {
           value={form.password}
           onChange={handleChange}
           required
-          className="w-full outline-none px-2 py-1.5 border rounded-sm border-gray-400"
+          className="w-full form-input"
           placeholder="password"
         />
         {error ? (
@@ -97,7 +97,7 @@ const Login = () => {
         </span>
         <button
           type="submit"
-          className={ `${role==="Recruiter"? " bg-purple-500": "bg-blue-500"} w-full  text-white font-semibold px-8 py-2.5 rounded-sm cursor-pointer`}
+          className={ `${role==="Recruiter"? " bg-purple-500": "bg-blue-500"} w-full  text-white font-semibold tracking-wide px-8 py-2.5 rounded-sm cursor-pointer transition-colors duration-400 hover:bg-black`}
         >
           Login
         </button>
@@ -107,7 +107,7 @@ const Login = () => {
         <span
           className="text-blue-500 cursor-pointer"
           onClick={() =>{
-            role==="Recruiter"? navigate("/signup?role=Recruiter"): navigate("/signup?role=Candidate")
+            navigate("/signup");
           }}
         >
           SignUp

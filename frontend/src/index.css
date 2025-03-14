@@ -6,8 +6,19 @@
   @apply p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer;
 }
 
+.form-input{
+  @apply border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400 p-2 transition-all hover:bg-blue-50
+}
+
+.form-select{
+  @apply border border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all hover:bg-blue-50
+}
+
 .flash {
   animation: flashAnim 0.5s ease-in-out;
+}
+.flashInput {
+  animation: flashBorder 0.5s ease-in-out;
 }
 
 @keyframes flashAnim {
@@ -20,4 +31,60 @@
   100% {
     background-color: inherit;
   }
+}
+@keyframes flashBorder {
+  0% {
+    border-color: pink;
+    
+  }
+  50% {
+    border-color: red;
+    border-width: 1.5px;
+    
+  }
+  100% {
+    border-color: pink;
+  }
+}
+
+.search_input{
+  @apply h-full w-[97%] outline-none text-sm font-medium tracking-wider p-2 ;
+}
+.search_input::placeholder{
+    transition: opacity 0.3s ease-in-out;
+}
+.fade-out::placeholder {
+  opacity: 0;
+}
+
+.fade-in::placeholder {
+  opacity: 1;
+}
+
+@keyframes slideDown {
+  from{
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+@keyframes slideUp {
+  from{
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  to{
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.slide-down{
+  animation: slideDown 0.2s ease-out forwards;
+}
+.slide-up{
+  animation: slideUp 0.2s ease-in forwards;
 }
