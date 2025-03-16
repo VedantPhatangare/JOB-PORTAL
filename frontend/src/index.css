@@ -48,7 +48,7 @@
 }
 
 .search_input{
-  @apply h-full w-[97%] outline-none text-sm font-medium tracking-wider p-2 ;
+  @apply h-full w-[97%] outline-none text-sm tracking-wider p-2 ;
 }
 .search_input::placeholder{
     transition: opacity 0.3s ease-in-out;
@@ -81,10 +81,36 @@
     transform: translateY(-10px);
   }
 }
+@keyframes slideLeft {
+  from{
+    opacity: 0;
+    transform: translateX(0px);
+  }
+  to{
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+}
+@keyframes slideRight {
+  from{
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+  to{
+    opacity: 0;
+    transform: translateX(0px);
+  }
+}
 
 .slide-down{
   animation: slideDown 0.2s ease-out forwards;
 }
 .slide-up{
   animation: slideUp 0.2s ease-in forwards;
+}
+.slide-left{
+  animation: slideLeft 0.2s ease-out forwards;
+}
+.slide-right{
+  animation: slideRight 0.2s ease-in forwards;
 }
