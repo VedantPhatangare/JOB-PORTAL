@@ -33,10 +33,11 @@ const Login = () => {
       if(role){
         const {rec_id} = response.data
         navigate(`/recruiterhome?id=${rec_id}`)
+        dispatch(login("Recruiter"));
       }else{
+        dispatch(login("Candidate"));
         navigate("/");
       }
-      dispatch(login());
       setform({ email: "", password: "" });
     } catch (error) {
       if (axios.isAxiosError(error)) {

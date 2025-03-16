@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/Store";
 import { logout } from "../../features/Authslice";
 import { IoIosPeople } from "react-icons/io";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaAngleRight } from "react-icons/fa";
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -13,11 +13,14 @@ const Navbar = () => {
   const [placeholder, setplaceholder] = useState("");
   const [isTransitioning, setisTransitioning] = useState(false);
   const loginRef = useRef<HTMLDivElement>(null);
+  const logoutRef = useRef<HTMLDivElement>(null);
   const placeholders = ["jobs...", "roles...", "openings..."];
-  const [isOpen, setisOpen] = useState(false);
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated
-  );
+  const [loginDropDown, setloginDropDown] = useState(false);
+  const [logoutDropDown, setlogoutDropDown] = useState(false);
+  const [showBtn, setshowBtn] = useState(false);
+  const userInfo = useSelector((state: RootState) => {
+    return { isLoggedin: state.auth.isAuthenticated, role: state.auth.role };
+  });
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -25,9 +28,10 @@ const Navbar = () => {
     navigate("/login");
   };
   const delayAnim = () => {
+    const ref: {refElement:React.RefObject<HTMLDivElement | null>, setFunction:React.Dispatch<React.SetStateAction<boolean>>} = loginRef.current? {refElement:loginRef, setFunction:setloginDropDown}: {refElement:logoutRef, setFunction:setlogoutDropDown} ;
     setTimeout(() => {
-      if (loginRef.current) loginRef.current.classList.remove("slide-up");
-      setisOpen(false);
+      if (ref.refElement.current) ref.refElement.current.classList.remove("slide-up");
+      ref.setFunction(false);
     }, 200);
   };
   useEffect(() => {
@@ -46,24 +50,38 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleHideRef = (e: MouseEvent) => {
+      const refElement: React.RefObject<HTMLDivElement | null> = loginRef.current? loginRef: logoutRef ;
       const target = e.target as HTMLElement;
-      if (
-        loginRef.current &&
-        !loginRef.current.contains(target) &&
-        !target.classList.contains("keep-open")
-      ) {
-        loginRef.current.classList.add("slide-up");
-        delayAnim();
+      if(refElement == loginRef){
+          if (
+            refElement.current &&
+            !refElement.current.contains(target) &&
+            !target.classList.contains("keep-open")
+          ) {
+            refElement.current.classList.add("slide-up");
+            delayAnim();
+          }
+      }else{
+        if (
+          refElement.current &&
+          !refElement.current.contains(target)
+        ) {
+          refElement.current.classList.add("slide-right");
+          delayAnim();
+        }
       }
     };
     document.addEventListener("mousedown", handleHideRef);
     return () => document.removeEventListener("mousedown", handleHideRef);
   }, []);
   return (
-    <nav className="sticky top-0 h-[8vh] z-30 w-full flex items-center justify-between p-2 border-b-1 border-gray-200 bg-white">
+    <nav className="sticky top-0 h-[8vh] z-30 w-full flex items-center justify-between p-2 border-b-1 border-gray-200 bg-neutral-50">
       <div
         className="logo w-[15%] text-center p-6 cursor-pointer flex justify-center items-center gap-2"
-        onClick={() => navigate("/")}
+        onClick={() => {
+          navigate("/");
+          if (!showBtn) setshowBtn((prev) => !prev);
+        }}
       >
         <IoIosPeople className="text-2xl" />
         <p className="text-xl font-semibold tracking-wider">
@@ -78,17 +96,64 @@ const Navbar = () => {
           className={`search_input ${
             isTransitioning ? "fade-out" : "fade-in"
           } `}
-        />  
+        />
       </div>
       <div className="buttons w-[25%]">
-        {isAuthenticated ? (
-          <div className="flex w-full justify-end">
+        {userInfo.isLoggedin ? (
+          <div className="relative flex flex-row gap-8 w-full justify-end items-center">
+            {userInfo.role == "Candidate" ? (
+              <div></div>
+            ) : userInfo.role == "Recruiter" && !showBtn ? (
+              ""
+            ) : (
+              <button
+                className="py-2 px-4 h-[95%] rounded-sm flex justify-center items-center text-sm tracking-wide cursor-pointer font-medium transition-all duration-300 hover:bg-black hover:text-white border-none bg-purple-100"
+                onClick={() => {
+                  navigate("/recruiterhome");
+                  setshowBtn(false);
+                }}
+              >
+                Recruiter Home
+              </button>
+            )}
             <button
-              onClick={handleLogout}
-              className="bg-gray-800 py-1.5 px-4 h-[95%] rounded-sm flex justify-center items-center text-white font-medium tracking-wide cursor-pointer transition-colors duration-300 hover:bg-black justify-self-end"
+              onClick={() => {
+                setlogoutDropDown((prev) => !prev);
+                // handleLogout()
+              }}
+              className={`bg-gray-800 py-1.5 px-4 h-[95%] rounded-sm flex justify-center items-center text-white tracking-wide font-medium cursor-pointer transition-all duration-300 hover:bg-black justify-self-end ${
+                logoutDropDown ? "hidden" : "visible"
+              }`}
             >
               Logout
             </button>
+            {logoutDropDown ? (
+              <div 
+              ref={logoutRef}
+              className="slide-left absolute z-20 bg-gray-800 text-white flex flex-row gap-6 left-0 justify-center items-center rounded-md w-full  transition-all">
+                <p className="text-sm font-semibold tracking-wider">Confirm choice</p>
+                <div className="flex flex-row gap-6 justify-center items-center rounded-lg py-2">
+                  <button 
+                  onClick={()=>{
+                    setlogoutDropDown(false);
+                    handleLogout()}}
+                  className="py-1.5 px-4 tracking-wide rounded-md flex  justify-center items-center text-md hover:text-white text-gray-800 cursor-pointer  bg-white transition-all duration-400 hover:bg-red-700">
+                    Logout
+                  </button>
+                  <button 
+                  onClick={()=>{
+                      logoutRef.current?.classList.add("slide-right");
+                      delayAnim()}
+                    }
+                  
+                  className="bg-blue-500 py-1.5 px-6 tracking-wide rounded-sm flex justify-center items-center text-white text-md  cursor-pointer  transition-all hover:bg-sky-600">
+                    Stay
+                  </button>
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
         ) : (
           <div className="relative flex gap-6 w-full items-center justify-center">
@@ -99,32 +164,34 @@ const Navbar = () => {
               SignUp
             </button>
             <button
-            onMouseOver={()=>setisOpen(!isOpen)}
+              onMouseOver={() => setloginDropDown(!loginDropDown)}
               onClick={() => {
-                if (!isOpen) {
-                  setisOpen((prev) => !prev);
+                if (!loginDropDown) {
+                  setloginDropDown((prev) => !prev);
                 } else {
                   if (loginRef.current)
                     loginRef.current.classList.add("slide-up");
-                  delayAnim()
+                  delayAnim();
                 }
               }}
               className="bg-black py-1.5 px-4 tracking-wide rounded-sm flex justify-center items-center gap-2 text-white font-medium cursor-pointer hover:bg-gray-800 transition-color duration-300 keep-open"
             >
-              Login <FaAngleRight 
-              className={`transition-all duration-200 ${isOpen?"rotate-90 ":""}`}
+              Login{" "}
+              <FaAngleRight
+                className={`transition-all duration-200 ${
+                  loginDropDown ? "rotate-90 " : ""
+                }`}
               />
             </button>
-            {isOpen && (
+            {loginDropDown && (
               <div
                 ref={loginRef}
-                className={`absolute  flex flex-wrap justify-center items-center gap-2 top-12 left-20 px-4 pb-4 bg-gray-50 py-2 border border-gray-100 $ slide-down`}
-                
-            onMouseLeave={()=>{
-              if (loginRef.current)
-                loginRef.current.classList.add("slide-up");
-              delayAnim()
-            }}
+                className={`absolute  flex flex-wrap justify-center items-center gap-2 top-12 left-20 px-4 pb-4 bg-gray-50 py-2 border border-gray-100 slide-down`}
+                onMouseLeave={() => {
+                  if (loginRef.current)
+                    loginRef.current.classList.add("slide-up");
+                  delayAnim();
+                }}
               >
                 <button
                   onClick={() => {
@@ -133,9 +200,9 @@ const Navbar = () => {
                       loginRef.current.classList.add("slide-up");
                     delayAnim();
                   }}
-                  className="py-1.5 px-2 tracking-wide rounded-sm flex justify-center items-center text-md cursor-pointer border border-gray-400 transition-all duration-400 hover:bg-gray-800 hover:text-white"
+                  className="py-1.5 px-2 tracking-wide rounded-sm flex justify-center items-center text-md cursor-pointer border border-gray-200  bg-gray-100 transition-all duration-400 hover:bg-gray-800 hover:text-white"
                 >
-                  as Recruiter
+                  Recruiter
                 </button>
                 <button
                   onClick={() => {
@@ -146,7 +213,7 @@ const Navbar = () => {
                   }}
                   className="bg-black py-1.5 px-2 tracking-wide rounded-sm flex justify-center items-center text-white text-md cursor-pointer hover:bg-gray-800 transition-color duration-300"
                 >
-                  as Candidate
+                  Candidate
                 </button>
               </div>
             )}
