@@ -9,16 +9,23 @@ import { IoCheckmarkDoneCircle } from "react-icons/io5";
 
 const RecruiterHome = () => {
   const [searchParams] = useSearchParams();
+  const id = searchParams.get("id") as string;
+
+  const [existingJobs, setexistingJobs] = useState<JobcardProps[]>([])
   const [newJobs, setnewJobs] = useState<JobcardProps[]>([]);
   const jobs = useSelector((state: RootState) => state.jobs.jobs);
-  const id = searchParams.get("id") as string;
-  const getPostedjobs = () => {
-    let newjobs = jobs.filter((job) => job.postedBy.id == id);
-    setnewJobs(newjobs);
-  };
+
   useEffect(() => {
+    setexistingJobs(jobs);
+  }, [jobs]);
+
+  useEffect(() => {
+    const getPostedjobs = () => {
+      let newjobs = existingJobs?.filter((job) => job.postedBy.id == id);
+      setnewJobs(newjobs);
+    };
     getPostedjobs();
-  }, [jobs, id]);
+  }, [existingJobs]);
 
   const [error, seterror] = useState<string | null>(null);
   const [msgSucces, setmsgSucces] = useState<string | null>(null);
@@ -87,6 +94,13 @@ const RecruiterHome = () => {
       });
 
        setmsgSucces(response.data.message);
+       setnewJobs((prev)=>[...prev,response.data.job])
+       setTitle("");
+       setCompany("");
+       setLocation("");
+       setSalary("");
+       setJobtype("");
+       if (description.current) description.current.value = "";
        setTimeout(() => {
         setmsgSucces(null)
        }, 3000);
@@ -98,17 +112,17 @@ const RecruiterHome = () => {
       }
     }
   };
-
+  
   return (
-    <div className="min-h-[90vh] w-full flex flex-row gap-2 p-2">
-      <div className="w-[70vw] p-2 bg-blue-50">
-        {newJobs.length != 0 && newJobs
+    <div className="min-h-[90vh] w-full flex flex-row gap-2 p-2 bg-blue-50">
+      <div className="flex flex-row h-full flex-wrap w-[75vw] p-2 ">
+        {newJobs?.length != 0 && newJobs
           ? newJobs.map((job: JobcardProps) => (
               <JobpostCard key={job._id} {...job} />
             ))
           : "No Job Post from You"}
       </div>
-      <div className="w-[30vw] py-6 rounded-2xl">
+      <div className="w-[25vw] py-6 rounded-sm border border-gray-300 border-t-white">
         <h2 className="text-xl font-semibold text-center mb-8">
           Create New Job
         </h2>
@@ -116,7 +130,7 @@ const RecruiterHome = () => {
           action=""
           onSubmit={handleCreatejob}
           ref={inputDiv}
-          className="flex flex-col max-w-96 m-auto gap-4"
+          className="flex flex-col max-w-86 m-auto gap-4"
         >
           <input
             type="text"
