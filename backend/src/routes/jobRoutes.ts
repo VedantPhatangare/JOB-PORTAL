@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { createJob, getJobs } from "../controllers/jobControllers.js";
+import { createJob, DeleteJob, getJobs } from "../controllers/jobControllers.js";
 import jwtVerify from "../middlewares/authMiddleware.js";
 import multer from "multer";
 
@@ -8,5 +8,6 @@ const upload = multer();
 
 jobRouter.post("/createjob",jwtVerify,upload.none(), createJob)
 jobRouter.get("/getjobs", getJobs)
+jobRouter.delete("/deletejob",jwtVerify, DeleteJob)
 
 export default jobRouter;

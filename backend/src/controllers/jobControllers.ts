@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import Job from "../models/job.model.js";
 import User from "../models/user.model.js";
-import { it } from "node:test";
 
 export const createJob = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
         console.log(req.body)
@@ -20,5 +19,11 @@ export const createJob = asyncHandler(async(req:Request,res:Response,next:NextFu
 export const getJobs = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
         const jobs = await Job.find();
         res.status(201).json({message:"Jobs fetched successfully",jobs});
+        return;
+});      
+export const DeleteJob = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+        const {id} = req.body;
+        await Job.findByIdAndDelete(id)
+        res.status(201).json({message:"Job Deleted successfully"});
         return;
 });      

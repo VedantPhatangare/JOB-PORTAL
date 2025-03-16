@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { JobcardProps } from "../../utils/types";
 import axios from "axios";
+import { Appdispatch, RootState } from "../../app/Store";
+import { useDispatch, useSelector } from "react-redux";
+import { setJobs } from "../../features/Jobslice";
 
 function JobpostCard({
   _id,
@@ -11,9 +14,16 @@ function JobpostCard({
   jobtype,
   createdAt,
 }: JobcardProps): React.ReactElement {
+
+
   const [appl, setappl] = useState<number>(0);
+
+  const jobs = useSelector((state: RootState) => state.jobs.jobs);
+  const usedispatch = useDispatch<Appdispatch>()
   const token = localStorage.getItem("token");
-  const getApplicants = async () => {
+
+
+  const getApplicantsCount = async () => {
     try {
       let response = await axios.get(
         `http://127.0.0.1:5000/api/application/${_id}/getApplicants`,
@@ -28,12 +38,28 @@ function JobpostCard({
       console.log(error);
     }
   };
+
+  const handleDelete= async(_id:string)=>{
+    console.log(_id);
+    
+      let Response = await axios.delete(`http://127.0.0.1:5000/api/jobs/deletejob`,{
+        data:{id:_id}
+      ,
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const msg = Response.data.message
+      console.log(msg);
+      let newJobs = jobs.filter((job)=> job._id != _id)
+      usedispatch(setJobs(newJobs))
+  }
   useEffect(() => {
-    getApplicants();
+    getApplicantsCount();
   }, []);
 
   return (
-    <div className="bg-white w-[30%] rounded-lg p-1">
+    <div className="bg-white rounded-lg p-1 m-1 h-40">
       <h2 className="text-xl font-semibold text-gray-800">
         {jobtype} {title}
       </h2>
@@ -46,6 +72,12 @@ function JobpostCard({
         Posted on: {new Date(createdAt as Date).toLocaleString()}
       </div>
       <div>Total Applications: {appl}</div>
+      <button
+        onClick={()=>handleDelete(_id)}
+        className="bg-red-500 text-white rounded-sm px-2 py-1 cursor-pointer text-sm"
+      >
+        Delete
+      </button>
     </div>
   );
 }
