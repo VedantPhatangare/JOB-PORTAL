@@ -4,6 +4,8 @@ import axios from "axios";
 import { Appdispatch, RootState } from "../../app/Store";
 import { useDispatch, useSelector } from "react-redux";
 import { setJobs } from "../../features/Jobslice";
+import { useNavigate } from "react-router-dom";
+import { setCandiates } from "../../features/Candidate";
 
 function JobpostCard({
   _id,
@@ -21,7 +23,7 @@ function JobpostCard({
   const jobs = useSelector((state: RootState) => state.jobs.jobs);
   const usedispatch = useDispatch<Appdispatch>()
   const token = localStorage.getItem("token");
-
+  const navigate = useNavigate();
 
   const getApplicantsCount = async () => {
     try {
@@ -54,6 +56,7 @@ function JobpostCard({
       let newJobs = jobs.filter((job)=> job._id != _id)
       usedispatch(setJobs(newJobs))
   }
+  
   useEffect(() => {
     getApplicantsCount();
   }, []);
@@ -72,12 +75,21 @@ function JobpostCard({
         Posted on: {new Date(createdAt as Date).toLocaleString()}
       </div>
       <div>Total Applications: {appl}</div>
+      <div className="flex flex-row gap-4">
       <button
         onClick={()=>handleDelete(_id)}
         className="bg-red-500 text-white rounded-sm px-2 py-1 cursor-pointer text-sm"
       >
         Delete
       </button>
+
+      <button 
+      onClick={()=>navigate(`/applicantions/${_id}`)
+      }
+      className="bg-blue-500 flex-grow text-white rounded-sm px-2 py-1 cursor-pointer text-sm">
+        See applicantions &gt;
+      </button>
+      </div>
     </div>
   );
 }
