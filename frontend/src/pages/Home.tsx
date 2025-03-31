@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 const Jobcard = lazy(() => import("../Components/JobCard/Jobcard"));
-// import Jobcard from "../Components/JobCard/Jobcard"
 import { JobcardProps } from "../utils/types";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -22,9 +21,9 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-full flex justify-center items-center">
+    <div className="relative w-full h-full flex justify-center items-center bg-gray-100">
       <div className="w-[30%] h-full "></div>
-      <div className="jobs w-[40%] h-full p-4 flex flex-row">
+      <div className=" w-[40%] h-full p-4 flex flex-col">
         {jobs.length != 0 && jobs ? (
           jobs.map((job: JobcardProps) => (
             <Suspense fallback={<HomeLoader />}>

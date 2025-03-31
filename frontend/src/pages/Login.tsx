@@ -9,7 +9,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [loader, setloader] = useState<boolean>(false);
-  const role = (searchParams.get('role') as "Recruiter" || null );
+  const role = (searchParams.get("role") as "Recruiter") || "Candidate";
   const [form, setform] = useState({ email: "", password: "" });
   const [error, seterror] = useState("");
 
@@ -17,27 +17,32 @@ const Login = () => {
     const { name, value } = e.target;
     setform((prev) => ({ ...prev, [name]: value }));
   };
-
-  const handlelogin = async (e: React.FormEvent<HTMLFormElement>,role:"Recruiter" | null) => {
+ 
+  
+  const handlelogin = async (
+    e: React.FormEvent<HTMLFormElement>,
+    role: "Recruiter" | "Candidate"
+  ) => {
     e.preventDefault();
     setloader(true);
     try {
-      let response = await axios.post(
-        "http://127.0.0.1:5000/api/auth/login",
-        {...form,role}
-      );
+      let response = await axios.post("http://127.0.0.1:5000/api/auth/login", {
+        ...form,
+        role,
+      });
+      if (role=="Recruiter") {
+        const { rec_id } = response.data;
+        navigate(`/recruiterhome?id=${rec_id}`);
+        dispatch(login({role:"Recruiter",id:rec_id}));
+      } else {
+        const { user_id } = response.data;
+        dispatch(login({role:"Candidate",id:user_id}));
+        navigate("/");
+      }
       setloader(false);
       console.log(response.data);
       const { token } = response.data;
       localStorage.setItem("token", token);
-      if(role){
-        const {rec_id} = response.data
-        navigate(`/recruiterhome?id=${rec_id}`)
-        dispatch(login("Recruiter"));
-      }else{
-        dispatch(login("Candidate"));
-        navigate("/");
-      }
       setform({ email: "", password: "" });
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -54,68 +59,73 @@ const Login = () => {
 
   return (
     <div className="relative w-full h-[90vh] z-10">
-      {
-        loader && <div 
-        className="absolute z-10 h-full w-full flex justify-center items-center">
+      {loader && (
+        <div className="absolute z-10 h-full w-full flex justify-center items-center">
           <div className="absolute h-full w-full bg-blue-200 opacity-20"></div>
-            <div className="relative z-20 bottom-18 w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
+          <div className="relative z-20 bottom-18 w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
         </div>
-      }
-    <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-xl bg-white shadow-sm hover:shadow-none transition-all flex flex-col items-center p-2">
-      
-      <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
-        {role =="Recruiter"?"Recruiter Login":"Candidate Login"}
-      </div>
-      <form
-        action=""
-        onSubmit={(e)=>handlelogin(e,role)}
-        className="relative h-[48%] w-[80%] flex flex-col gap-4 items-center">
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          className="w-full form-input"
-          placeholder="email"
-        />
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="w-full form-input"
-          placeholder="password"
-        />
-        {error ? (
-          <div className="text-red-500 text-sm absolute top-[44%] left-[0]">{error}</div>
-        ) : (
-          ""
-        )}
-        <span className="self-end mt-3 text-blue-500 cursor-pointer">
-          forgot password?
-        </span>
-        <button
-          type="submit"
-          className={ `${role==="Recruiter"? " bg-purple-500": "bg-blue-500"} w-full  text-white font-semibold tracking-wide px-8 py-2.5 rounded-sm cursor-pointer transition-colors duration-400 hover:bg-black`}
+      )}
+      <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-sm bg-white shadow-sm hover:shadow-none transition-all flex flex-col items-center p-2">
+        <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
+          {role == "Recruiter" ? "Recruiter Login" : "Candidate Login"}
+        </div>
+        <form
+          action=""
+          onSubmit={(e) => handlelogin(e, role)}
+          className="relative w-[80%] flex flex-col gap-4 items-center mb-6"
         >
-          Login
-        </button>
-      </form>
-      <div className="mb-4">
-        Don't have an account?{" "}
-        <span
-          className="text-blue-500 cursor-pointer"
-          onClick={() =>{
-            role? navigate("/signup?role=Recruiter"): navigate("/signup?role=Candidate");
-          }}
-        >
-          SignUp
-        </span>
+          <div className="w-72 flex flex-col gap-6 items-center">
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full form-input"
+              placeholder="email"
+            />
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full form-input"
+              placeholder="password"
+            />
+          </div>
+          {error ? (
+            <div className="text-red-500 text-sm absolute top-28 left-0">
+              {error}
+            </div>
+          ) : (
+            ""
+          )}
+          <span className="self-end mt-3 text-blue-500 cursor-pointer">
+            forgot password?
+          </span>
+          <button
+            type="submit"
+            className={`${
+              role === "Recruiter" ? " bg-purple-500" : "bg-blue-500"
+            } w-full  text-white font-semibold tracking-wide px-8 py-2.5 rounded-full cursor-pointer transition-colors duration-400 hover:bg-black`}
+          >
+            Login
+          </button>
+        </form>
+        <div className="mb-4">
+          Don't have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer"
+            onClick={() => {
+              role=== "Recruiter"? navigate("/signup?role=Recruiter"): navigate("/signup?role=Candidate");
+            }}
+          >
+            SignUp
+          </span>
+        </div>
+        <span>or</span>
       </div>
-      <span>or</span>
-    </div>
     </div>
   );
 };

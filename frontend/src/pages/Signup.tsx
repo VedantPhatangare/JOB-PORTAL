@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
@@ -12,8 +12,12 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
-    role: !Role ? "" : Role == "Candidate" ? "Candidate" : "Recruiter",
+    role: Role ? Role: "",
   });
+  useEffect(() => {
+    if(Role=="") setform({ name: "", email: "", password: "", role: "" });
+  }, [searchParams])
+
   const [error, seterror] = useState("");
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,7 +49,7 @@ const Signup = () => {
 
   return (
     <div className="relative w-[25%] h-[90vh]">
-      <div className="relative mt-20 rounded-xl bg-white flex flex-col items-center p-2">
+      <div className="relative mt-20 rounded-lg bg-white flex flex-col items-center p-2">
         <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
           SignUp
         </div>
@@ -62,7 +66,7 @@ const Signup = () => {
                 setform((prev) => ({ ...prev, role: e.target.value }))
               }
               required
-              className="w-full form-input"
+              className="w-full selectinput-nohover"
             >
               <option value="" disabled>
                 Select Role
