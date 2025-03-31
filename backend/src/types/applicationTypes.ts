@@ -1,3 +1,4 @@
 export interface applyStatus{
-    status: "Accepted" | "Rejected"
+    status: "Accepted" | "Rejected",
+    job_id: string
 }
