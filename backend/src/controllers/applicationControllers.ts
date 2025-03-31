@@ -19,7 +19,7 @@ export const apply = asyncHandler(async(req:Request,res:Response,next:NextFuncti
 
     if(!job_id){
         return res.status(400).json({message:"Job id is required to apply for a job"})
-    };
+    }
     if(!applicant_id){
         return res.status(400).json({message:"Applicant id is required to apply for a job"})
     }
@@ -56,18 +56,32 @@ export const apply = asyncHandler(async(req:Request,res:Response,next:NextFuncti
 
 export const getApplicants = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
     const{job_id} = req.params;
-    const role = req.user?.role;
-    if(role != 'Recruiter'){
-        return res.status(401).json({message:"please login as a recruiter"})
-    }
-    const applications = await Application.find({job_id});
+    
+    const applications = await Application.find({job_id})
+    .populate('applicant_id','name email')
+    .exec();
+
     return res.status(201).json({message:"applications fetched succesfully",applications})
+});
+export const getApplicant = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    const{user_id,job_id} = req.body;
+    
+    const application = await Application.findOne({job_id,applicant_id :user_id})
+    if (application) return res.status(200).json({success: true,message:"application fetched succesfully",application});
+    else {
+        return res.status(404).json({
+            success: false,
+            message: "No application found for the given user and job"
+        });
+    }
 });
 
 export const HireCandidate = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    const {status}:applyStatus = req.body;
-    const {application_id} = req.params;
+    const {status,job_id}:applyStatus = req.body;
+    const {applicant_id} = req.params;
+    console.log("hi",job_id,applicant_id);
+    
+    const application = await Application.findOneAndUpdate({applicant_id,job_id},{status});
 
-    const application = await Application.findByIdAndUpdate({_id:application_id},{status});
     res.status(200).json({message:`applicant ${status} succesfully`,application})
 })
