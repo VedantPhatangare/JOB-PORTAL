@@ -23,3 +23,28 @@ export interface JobcardProps {
     jobtype:jobPostInput ,
     description: jobPostInput
   }
+
+  export interface applicantData{
+    job_id: string,
+    applicant_id:{
+      email:string,
+      name: string,
+      _id: string
+    },
+    status:"Pending" | "Accepted" | "Rejected",
+    resume:string,
+    coverletter?: string,
+    createdAt: Date
+  }
+
+
+export interface IApplication {
+  job_id: string;
+  applicant_id: string;
+  status: "Pending" | "Accepted" | "Rejected";
+  resume: string;
+  coverletter?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
