@@ -37,7 +37,7 @@ export const loginUser = asyncHandler(
         .json({ message: "Please Enter valid email or Register first" });
     }
 
-    if (user.role != role) {
+    if (role && user.role != role) {
       return res
         .status(404)
         .json({ message: `email already registered as ${user.role}` });
@@ -63,6 +63,11 @@ export const loginUser = asyncHandler(
     }
     return res
       .status(200)
-      .json({ message: "User logged in successfully", token });
+      .json({
+        message: "User logged in successfully", 
+        token,
+        user_id: user._id
+       });
   }
 );
+
