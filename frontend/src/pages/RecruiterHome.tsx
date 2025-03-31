@@ -1,32 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../app/Store";
-import { useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Appdispatch, RootState } from "../app/Store";
 import { JobcardProps, jobPostForm } from "../utils/types";
 import JobpostCard from "../Components/JobPostCard/JobpostCard";
 import axios from "axios";
 import { IoCheckmarkDoneCircle } from "react-icons/io5";
+import { setJobs } from "../features/Jobslice";
 
 const RecruiterHome = () => {
-  const [searchParams] = useSearchParams();
-  const id = searchParams.get("id") as string;
-
-  const [existingJobs, setexistingJobs] = useState<JobcardProps[]>([])
-  const [newJobs, setnewJobs] = useState<JobcardProps[]>([]);
-  const jobs = useSelector((state: RootState) => state.jobs.jobs);
-
-  useEffect(() => {
-    setexistingJobs(jobs);
-  }, [jobs]);
-
-  useEffect(() => {
-    const getPostedjobs = () => {
-      let newjobs = existingJobs?.filter((job) => job.postedBy.id == id);
-      setnewJobs(newjobs);
-    };
-    getPostedjobs();
-  }, [existingJobs]);
-
+ 
   const [error, seterror] = useState<string | null>(null);
   const [msgSucces, setmsgSucces] = useState<string | null>(null);
   const [title, setTitle] = useState("");
@@ -37,6 +19,21 @@ const RecruiterHome = () => {
   const description = useRef<HTMLTextAreaElement>(null);
   const errorDiv = useRef<HTMLDivElement>(null);
   const inputDiv = useRef<HTMLFormElement>(null);
+
+  const [postedJobs, setPostedJobs] = useState<JobcardProps[]>([]);
+  const jobs = useSelector((state: RootState) => state.jobs.jobs);
+  const id = useSelector((state: RootState) => state.auth.id);
+  const dispatch = useDispatch<Appdispatch>();
+
+  useEffect(() => {
+    const getPostedjobs = () => {
+      let newjobs = jobs?.filter((job) => job.postedBy.id == id);
+      setPostedJobs(newjobs);
+    };
+    getPostedjobs();
+    console.log(jobs);
+    
+  }, [jobs]);
 
   const handleCreatejob = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -81,48 +78,51 @@ const RecruiterHome = () => {
     Object.entries(allClear).forEach((data) => {
       formdata.append(data[0], data[1].value);
     });
-    
-    
-    try {
-      let response = await axios.post("http://127.0.0.1:5000/api/jobs/createjob", 
-        formdata, 
-        {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-       setmsgSucces(response.data.message);
-       setnewJobs((prev)=>[...prev,response.data.job])
-       setTitle("");
-       setCompany("");
-       setLocation("");
-       setSalary("");
-       setJobtype("");
-       if (description.current) description.current.value = "";
-       setTimeout(() => {
-        setmsgSucces(null)
-       }, 3000);
+    try {
+      let response = await axios.post(
+        "http://127.0.0.1:5000/api/jobs/createjob",
+        formdata,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setmsgSucces(response.data.message);
+      //  setnewJobs((prev)=>[...prev,response.data.job])
+      const newJobs = [...jobs, response.data.job];
+      dispatch(setJobs(newJobs));
+      setTitle("");
+      setCompany("");
+      setLocation("");
+      setSalary("");
+      setJobtype("");
+      if (description.current) description.current.value = "";
+      setTimeout(() => {
+        setmsgSucces(null);
+      }, 3000);
     } catch (error) {
-      if(axios.isAxiosError(error)){
-        seterror(error.response?.data.message)
-      }else if(error instanceof Error){
-        seterror(error.message)
+      if (axios.isAxiosError(error)) {
+        seterror(error.response?.data.message);
+      } else if (error instanceof Error) {
+        seterror(error.message);
       }
     }
   };
-  
+
   return (
     <div className="min-h-[90vh] w-full flex flex-row gap-2 p-2 bg-blue-50">
       <div className="flex flex-row h-full flex-wrap w-[75vw] p-2 ">
-        {newJobs?.length != 0 && newJobs
-          ? newJobs.map((job: JobcardProps) => (
+        {postedJobs?.length != 0 && postedJobs
+          ? postedJobs.map((job: JobcardProps) => (
               <JobpostCard key={job._id} {...job} />
             ))
           : "No Job Post from You"}
       </div>
-      <div className="w-[25vw] py-6 rounded-sm border border-gray-300 border-t-white">
+      <div className="w-[25vw] py-6 rounded-sm border border-gray-300 border-t-white bg-white">
         <h2 className="text-xl font-semibold text-center mb-8">
           Create New Job
         </h2>
@@ -208,14 +208,12 @@ const RecruiterHome = () => {
               {error}
             </div>
           )}
-          {
-            msgSucces && (
-              <div className="text-blue-400">
+          {msgSucces && (
+            <div className="text-blue-400">
               <IoCheckmarkDoneCircle />
               {msgSucces}
             </div>
-  )
-          }
+          )}
           <button
             type="submit"
             className="bg-blue-400 p-2 rounded-md text-white font-medium cursor-pointer transition-all hover:bg-black"
