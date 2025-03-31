@@ -10,8 +10,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [placeholder, setplaceholder] = useState("");
+  const [placeholder, setplaceholder] = useState("openings...");
   const [isTransitioning, setisTransitioning] = useState(false);
+  const [searchtext, setsearchtext] = useState("")
   const loginRef = useRef<HTMLDivElement>(null);
   const logoutRef = useRef<HTMLDivElement>(null);
   const placeholders = ["jobs...", "roles...", "openings..."];
@@ -21,11 +22,11 @@ const Navbar = () => {
   const userInfo = useSelector((state: RootState) => {
     return { isLoggedin: state.auth.isAuthenticated, role: state.auth.role };
   });
-
+  const navRef = useRef<HTMLDivElement>(null)
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch(logout());
-    navigate("/login");
+    if(userInfo.role=="Recruiter") navigate("/login?role=Recruiter");else navigate("/login");
   };
   const delayAnim = () => {
     const ref: {refElement:React.RefObject<HTMLDivElement | null>, setFunction:React.Dispatch<React.SetStateAction<boolean>>} = loginRef.current? {refElement:loginRef, setFunction:setloginDropDown}: {refElement:logoutRef, setFunction:setlogoutDropDown} ;
@@ -74,14 +75,35 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleHideRef);
     return () => document.removeEventListener("mousedown", handleHideRef);
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (navRef.current){
+        if (window.scrollY > 20) {
+          const maxsroll = 100;
+          const scrollPosition = window.scrollY;
+          let brightnessFactor = Math.max(0,1-scrollPosition/maxsroll);
+          navRef.current.style.background = `linear-gradient(to bottom, rgba(255, 255, 255, ${brightnessFactor * 0.5}), rgba(255, 255, 255, ${brightnessFactor})) 0% 0% / cover, linear-gradient(to bottom, #bcc3cd, #f3f4f6)`;
+          navRef.current.style.opacity = "1";
+        } else {
+          navRef.current.style.background = "bg-neutral-100";
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   return (
-    <nav className="sticky top-0 h-[8vh] z-30 w-full flex items-center justify-between p-2 border-b-1 border-gray-200 bg-neutral-50">
+    <nav 
+    ref={navRef} 
+    className="sticky top-0 h-[8vh] z-30 w-full flex items-center justify-between p-2 transition-all">
       <div
         className="logo w-[15%] text-center p-6 cursor-pointer flex justify-center items-center gap-2"
         onClick={() => {
           navigate("/");
-          if (!showBtn) setshowBtn((prev) => !prev);
-        }}
+          setshowBtn((prev)=>!prev? !prev: prev);
+        }}  
       >
         <IoIosPeople className="text-2xl" />
         <p className="text-xl font-semibold tracking-wider">
@@ -93,8 +115,10 @@ const Navbar = () => {
         <input
           type="text"
           placeholder={`Search for ${placeholder}`}
+          value={searchtext}
+          onChange={(e)=>setsearchtext(e.target.value)}
           className={`search_input ${
-            isTransitioning ? "fade-out" : "fade-in"
+            searchtext? "": isTransitioning? "fade-out" : "fade-in"
           } `}
         />
       </div>
@@ -103,9 +127,7 @@ const Navbar = () => {
           <div className="relative flex flex-row gap-8 w-full justify-end items-center">
             {userInfo.role == "Candidate" ? (
               <div></div>
-            ) : userInfo.role == "Recruiter" && !showBtn ? (
-              ""
-            ) : (
+            ) : userInfo.role == "Recruiter" && showBtn==true ? (
               <button
                 className="py-2 px-4 h-[95%] rounded-sm flex justify-center items-center text-sm tracking-wide cursor-pointer font-medium transition-all duration-300 hover:bg-black hover:text-white border-none bg-purple-100"
                 onClick={() => {
@@ -115,6 +137,8 @@ const Navbar = () => {
               >
                 Recruiter Home
               </button>
+            ) : (
+              ""
             )}
             <button
               onClick={() => {
@@ -137,7 +161,7 @@ const Navbar = () => {
                   onClick={()=>{
                     setlogoutDropDown(false);
                     handleLogout()}}
-                  className="py-1.5 px-4 tracking-wide rounded-md flex  justify-center items-center text-md hover:text-white text-gray-800 cursor-pointer  bg-white transition-all duration-400 hover:bg-red-700">
+                  className="py-1 px-4 tracking-wide rounded-md flex  justify-center items-center text-md hover:text-white text-gray-800 cursor-pointer  bg-white transition-all duration-400 hover:bg-red-700">
                     Logout
                   </button>
                   <button 
@@ -146,7 +170,7 @@ const Navbar = () => {
                       delayAnim()}
                     }
                   
-                  className="bg-blue-500 py-1.5 px-6 tracking-wide rounded-sm flex justify-center items-center text-white text-md  cursor-pointer  transition-all hover:bg-sky-600">
+                  className="bg-blue-500 py-1 px-6 tracking-wide rounded-sm flex justify-center items-center text-white text-md  cursor-pointer  transition-all hover:bg-sky-600">
                     Stay
                   </button>
                 </div>
@@ -158,7 +182,7 @@ const Navbar = () => {
         ) : (
           <div className="relative flex gap-6 w-full items-center justify-center">
             <button
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/signup?role=")}
               className="py-1.5 px-3 h-[95%] tracking-wide rounded-sm flex justify-center items-center cursor-pointer text-black font-medium transition-all duration-300"
             >
               SignUp
