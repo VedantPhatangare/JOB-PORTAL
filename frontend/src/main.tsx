@@ -15,6 +15,7 @@ import Home from "./pages/Home";
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const RecruiterHome = lazy(() => import("./pages/RecruiterHome"));
+const Applications = lazy(() => import("./pages/Applications"));
 const JobDescription = lazy(
   () => import("./Components/JobDescription/JobDescription")
 );
@@ -60,12 +61,20 @@ const Router = createBrowserRouter([
         // loader: Jobloader,
         element: (
           <Suspense fallback={<div>loading...</div>}>
-            <JobDescription />,
+            <JobDescription />
           </Suspense>
-        ),
+        )
       },
-    ],
-  },
+      {
+        path:"/applicantions/:job_id",
+        element:(
+          <Suspense>
+            <Applications/>
+          </Suspense>
+        )
+      }
+    ]
+  }
 ]);
 
 createRoot(document.getElementById("root")!).render(
