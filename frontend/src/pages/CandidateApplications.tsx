@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../app/Store";
 import { getCandidateAppliedJobsService } from "../api/services";
 import { toast } from "react-toastify";
-import { Briefcase, Building2, MapPin, IndianRupee, Clock, CheckCircle, XCircle, SearchX } from "lucide-react";
+import { Building2, MapPin, IndianRupee, Clock, CheckCircle, XCircle, SearchX } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 

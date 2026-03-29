@@ -6,7 +6,7 @@ import { registerService } from "../api/services";
 import { signupSchema, SignupFormValues } from "../validations/auth";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import { UserPlus, Mail, Lock, Loader2, User, Briefcase } from "lucide-react";
+import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
 
 const Signup = () => {
   const navigate = useNavigate();
