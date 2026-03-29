@@ -175,7 +175,7 @@ const JobDescription = () => {
             </div>
 
             {/* Details Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <DetailCard icon={<IndianRupee size={20} />} label="Salary" value={`${currentJob.salary} LPA`} />
               {currentJob.experience && <DetailCard icon={<Clock size={20} />} label="Experience" value={currentJob.experience} />}
               <DetailCard icon={<Briefcase size={20} />} label="Job Type" value={currentJob.jobtype} />
@@ -193,8 +193,8 @@ const JobDescription = () => {
           </div>
 
           {/* Sidebar / Apply Section */}
-          <div className="w-full lg:w-[400px]">
-            <div className="sticky top-24">
+          <div className="w-full lg:w-[400px] shrink-0">
+            <div className="lg:sticky lg:top-24">
               {isLoadingStatus ? (
                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-center min-h-[300px]">
                   <Loader2 className="animate-spin text-primary-400" size={32} />

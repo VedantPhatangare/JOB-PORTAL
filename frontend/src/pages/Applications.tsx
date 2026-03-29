@@ -188,15 +188,15 @@ function Applications() {
         </button>
 
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-5 md:p-8 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex flex-col">
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
-                <Users className="text-primary-600" size={24} /> Review Applicants
+              <h1 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+                <Users className="text-primary-600" size={22} /> Review Applicants
               </h1>
-              <p className="text-gray-500 mt-1">Review and manage candidates that applied to this position.</p>
+              <p className="text-gray-500 mt-1 text-sm">Review and manage candidates for this position.</p>
             </div>
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
-               <span className="text-gray-500 font-semibold text-sm">Total Applications:</span>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 self-start sm:self-auto">
+               <span className="text-gray-500 font-semibold text-sm">Total:</span>
                <span className="text-xl font-black text-primary-600">{applicants.length}</span>
             </div>
           </div>
@@ -207,8 +207,8 @@ function Applications() {
                 <Loader2 size={40} className="animate-spin text-primary-400" />
               </div>
             ) : applicants.length > 0 ? (
-              <div className="overflow-x-auto custom-scrollbar">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto custom-scrollbar -mx-0">
+                <table className="w-full min-w-[640px] text-left border-collapse">
                   <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
                       <tr key={headerGroup.id} className="bg-gray-50/80 border-b border-gray-100">

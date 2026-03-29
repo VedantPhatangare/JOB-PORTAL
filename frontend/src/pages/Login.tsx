@@ -73,13 +73,13 @@ const Login = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-8"
+        className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-6 sm:p-8"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-inner ${selectedRole === "Recruiter" ? "bg-purple-50 text-purple-600" : "bg-primary-50 text-primary-600"}`}>
-            {selectedRole === "Recruiter" ? <Briefcase size={32} /> : <User size={32} />}
+          <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 shadow-inner ${selectedRole === "Recruiter" ? "bg-purple-50 text-purple-600" : "bg-primary-50 text-primary-600"}`}>
+            {selectedRole === "Recruiter" ? <Briefcase size={28} /> : <User size={28} />}
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
             {selectedRole === "Recruiter" ? "Recruiter Login" : "Candidate Login"}
           </h2>
           <p className="text-sm text-gray-500 mt-2 text-center">

@@ -137,7 +137,7 @@ const RecruiterHome = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col mx-2"
             >
               <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -152,10 +152,10 @@ const RecruiterHome = () => {
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto custom-scrollbar">
+              <div className="p-4 sm:p-6 overflow-y-auto custom-scrollbar">
                 <form id="create-job-form" onSubmit={handleSubmit(handleCreateJob)} className="space-y-5">
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Job Title</label>
                       <input 

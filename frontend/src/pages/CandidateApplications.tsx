@@ -82,7 +82,7 @@ const CandidateApplications = () => {
                       {app.job_id.jobtype}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500 mb-3">
                     <span className="flex items-center gap-1"><Building2 size={14}/> {app.job_id.company}</span>
                     <span className="flex items-center gap-1"><MapPin size={14}/> {app.job_id.location}</span>
                     <span className="flex items-center gap-1 text-gray-400"><IndianRupee size={14}/> {app.job_id.salary} LPA</span>

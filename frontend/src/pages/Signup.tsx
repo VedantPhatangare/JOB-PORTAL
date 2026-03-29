@@ -61,7 +61,7 @@ const Signup = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-8"
+        className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-6 sm:p-8"
       >
         <div className="flex flex-col items-center mb-6">
           <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-inner ${selectedRole === "Recruiter" ? "bg-purple-50 text-purple-600" : "bg-primary-50 text-primary-600"}`}>
