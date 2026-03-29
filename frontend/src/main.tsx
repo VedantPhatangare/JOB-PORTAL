@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import { lazy, Suspense } from "react";
 
-import Home from "./pages/Home";
+import Jobs from "./pages/Jobs";
 
 // import Login from './pages/Login'
 // import Signup from "./pages/Signup";
@@ -30,7 +30,7 @@ const Router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Jobs />,
       },
       {
         path: "/recruiterhome",

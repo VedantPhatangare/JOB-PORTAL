@@ -4,8 +4,10 @@ interface jobType extends Document{
   title: string,
   description: string,
   company: string,
+  companyLogo?: string,
   location: string,
   salary: number,
+  experience: string,
   jobtype: "Full-time"| "Part-time" | "Contract" | "Internship",
   postedBy: {name: string, id: string},
   createdBy:Date,
@@ -27,12 +29,19 @@ const jobSchema:Schema<jobType> = new mongoose.Schema(
             type: String,
             required: true
         },
+        companyLogo:{
+            type: String
+        },
         location:{
             type: String,
             required: true
         },
         salary:{
             type: Number,
+            required: true
+        },
+        experience:{
+            type: String,
             required: true
         },
         jobtype:{

@@ -2,13 +2,13 @@ import axios from "axios";
 import { RootState } from "../../app/Store";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import {  IApplication, JobcardProps } from "../../utils/types";
+import { IApplication, JobcardProps } from "../../utils/types";
 import React, { useEffect, useRef, useState } from "react";
-import { FaLocationDot } from "react-icons/fa6";
 import "./jdstyles.css";
 import { HiCash } from "react-icons/hi";
 import { BsClock } from "react-icons/bs";
 import { CgOrganisation } from "react-icons/cg";
+import { DetailCard } from "../DetailCard";
 const JobDescription = () => {
   const { job_id } = useParams();
 
@@ -19,10 +19,9 @@ const JobDescription = () => {
   // if (!jobs || jobs.length == 0) {
   //   return <div>Loading...</div>;
   // }
-  const currentJob: JobcardProps | undefined = jobs.find(
+  const currentJob: JobcardProps = jobs.find(
     (job) => job._id === job_id
-  );
-  // console.log(currentJob);
+  ) as JobcardProps;
 
   const [resume, setresume] = useState<File | null>(null);
   const [coverletter, setcoverletter] = useState<File | null>(null);
@@ -35,19 +34,21 @@ const JobDescription = () => {
   const token = localStorage.getItem("token");
 
   const getStatus = async () => {
-    let response = await axios.post(
-      "http://127.0.0.1:5000/api/application/getApplicant",
-      {
-        user_id,
-        job_id,
+    
+      let response = await axios.post(
+        "http://127.0.0.1:5000/api/application/getApplicant",
+        {
+          user_id,
+          job_id,
+        }
+      );
+      // console.log(response.data.application);
+  
+      if (response.data.success == true) {
+        const application: IApplication = response.data?.application;
+        setstatus(application.status);
       }
-    );
-    console.log(response.data.application);
-
-    if (response.data.success == true) {
-      const application: IApplication = response.data?.application;
-      setstatus(application.status);
-    }
+    
   };
   const handleApply = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -105,89 +106,83 @@ const JobDescription = () => {
   };
 
   useEffect(() => {
-
     getStatus();
   }, []);
 
   return (
-    <div className="flex-grow min-w-full flex flex-row  min-h-full">
-      <div className={status == null ? `w-[70%]` : `w-[100vw]`}>
-        {currentJob && (
-          <div className="flex flex-col m-2 gap-3 rounded-2xl p-2">
-            <div className="flex flex-col gap-2">
-              <div className="text-2xl font-semibold ">
-                {currentJob.title}
-                {
-                  status=="Accepted" && <span className="ml-28 text-sm  text-emerald-600 bg-emerald-50 rounded-sm p-2">{status}</span>
-                }
-                {
-                  status=="Rejected" && <span className="ml-28 text-sm  text-red-500 bg-red-100 rounded-sm p-2">{status}</span>
-                }
-                {
-                  status=="Pending" && <span className="ml-28 text-sm  text-blue-500 bg-blue-100 rounded-sm p-2">{status}</span>
-                }
-                
-              </div>
-              <p className="jobinfo self-start text-orange-500">
-                <span>
-                  <CgOrganisation />
-                </span>
-                {currentJob.company}
-              </p>
-            </div>
-            <div className="bg-blue-100 p-2 rounded-lg mb-4">
-              <div className="flex flex-col">
-                <div className="flex flex-row gap-10">
-                  <p className="jobinfo">
-                    <span>
-                      <FaLocationDot />
-                    </span>
-                    {currentJob.location}
-                  </p>
-                  <p className="jobinfo">
-                    <span>
-                      <HiCash />
-                    </span>
-                    {currentJob.salary} lpa
-                  </p>
-                  <p>
-                    <span>jobtype:</span>
-                    {currentJob.jobtype}
-                  </p>
-                  <p>job id: {currentJob._id}</p>
-                </div>
-              </div>
-              <div className="flex flex-row gap-10">
-                <p className="jobinfo self-start">
-                  <span>
-                    <BsClock />
-                  </span>
-                  {currentJob.createdAt
-                    ? new Date(currentJob.createdAt).toLocaleString()
-                    : "N/A"}
-                </p>
-                <p>
-                  <span>posted by:</span>
-                  {currentJob.postedBy.name}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-xl mb-4">Desription</h2>
-              <p>
-                {currentJob.description
-                  ? currentJob.description
-                  : "No description available"}
-              </p>
-            </div>
-          </div>
-        )}
+    <div className="relative w-full p-2">
+      <div className="relative max-w-8/12 p-6 bg-white rounded-lg shadow-lg">
+      <div className="flex items-center gap-6 mb-8">
+        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+          {currentJob?.companyLogo ? (
+            <img
+              src={currentJob.companyLogo}
+              alt={currentJob.company}
+              className="w-full h-full object-contain rounded-lg"
+            />
+          ) : (
+            <CgOrganisation className="w-8 h-8 text-gray-400" />
+          )}
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {currentJob?.title}
+          </h1>
+          <p className="text-lg text-gray-600">{currentJob?.company}</p>
+        </div>
+        <div className="ml-auto flex items-center gap-2 border border-gray-50 p-1">
+            <h4 className="text-sm"> Status :</h4>
+            <span
+              className={` p-1 rounded-sm ${
+                status == "Pending"
+                  ? "text-blue-500 bg-blue-50"
+                  : status == "Accepted"
+                  ? "text-green-600 bg-green-50"
+                  : status == "Rejected"
+                  ? "text-red-500 bg-red-50"
+                  : "text-gray-500 bg-gray-50"
+              }`}
+            >
+              {status || "Not Applied"}
+            </span>
+        </div>
       </div>
+
+      {/* Key Details */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <DetailCard
+          icon={<HiCash />}
+          label="Salary"
+          value={currentJob?.salary}
+        />
+        {
+          currentJob?.experience && <DetailCard icon={<BsClock />} label="Experience" value={currentJob.experience} />
+        }
+        
+        <DetailCard
+          icon={<CgOrganisation />}
+          label="Job Type"
+          value={currentJob?.jobtype}
+        />
+      </div>
+
+      {/* Job Description */}
+      <div className="max-h-96">
+        <h2 className="text-xl mb-4">Desription</h2>
+        <p className="bg-gray-100 p-1 rounded-md">
+          {currentJob?.description
+            ? currentJob.description
+            : "No description available"}
+        </p>
+      </div>
+
+      </div>
+
+      {/* Application Form */}
       {status == null && (
-        <div className="relative z-10 w-[30%] flex justify-center items-center p-14 border-l border-l-gray-200 ">
+        <div className="absolute top-0 right-0 w-[30%] flex justify-center items-center p-14">
           {!token && (
-            <div className="absolute m-auto z-20 text-white font-light tracking-wide text-xl">
+            <div className="absolute m-auto z-30 text-white tracking-wider text-2xl">
               Register/Login to Apply !
             </div>
           )}
@@ -196,7 +191,7 @@ const JobDescription = () => {
             onSubmit={handleApply}
             className={`relative z-10 flex flex-col justify-center min-h-full items-center w-full gap-4 ${
               token == null
-                ? "before:content-[''] before: absolute before:top-0 before:left-0 before:w-full before:h-full blur-[4px] rounded-sm before:z-20 before:pointer-events-auto pointer-events-none"
+                ? "before:content-[''] before: absolute before:top-0 before:left-0 before:w-full before:h-full blur-[8px] rounded-sm before:z-20 before:pointer-events-auto pointer-events-none"
                 : ""
             }`}
           >

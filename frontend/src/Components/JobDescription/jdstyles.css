@@ -1,7 +1,26 @@
+@import "tailwindcss";
+
 .jobinfo{
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 10px;
+}
+
+.job-description-container {
+  @apply bg-white rounded-lg shadow-lg transition-all duration-300;
+}
+
+.job-description-container:hover {
+  @apply shadow-xl;
+}
+
+.description-content {
+  /* @apply prose-gray max-w-none; */
+}
+
+.apply-button {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg
+         transition-all duration-300 transform hover:scale-105;
 }

@@ -3,9 +3,11 @@ export interface JobcardProps {
     title: string;
     description?: string;
     company: string;
+    companyLogo: string;
     location: string;
     salary: string;
     jobtype: string;
+    experience: string;
     postedBy: {name:string, id:string};
     createdAt?:Date
   }
@@ -18,8 +20,10 @@ export interface JobcardProps {
   export interface jobPostForm{
     title: jobPostInput,
     company: jobPostInput,
+    companyLogo?: jobPostInput,
     location: jobPostInput,
     salary: jobPostInput,
+    experience: jobPostInput,
     jobtype:jobPostInput ,
     description: jobPostInput
   }

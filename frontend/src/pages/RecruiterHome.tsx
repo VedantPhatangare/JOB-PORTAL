@@ -15,6 +15,7 @@ const RecruiterHome = () => {
   const [company, setCompany] = useState("");
   const [location, setLocation] = useState("");
   const [salary, setSalary] = useState("");
+  const [experience, setExperience] = useState("");
   const [jobtype, setJobtype] = useState("");
   const description = useRef<HTMLTextAreaElement>(null);
   const errorDiv = useRef<HTMLDivElement>(null);
@@ -44,6 +45,7 @@ const RecruiterHome = () => {
       company: { value: company, message: "Company name is required" },
       location: { value: location, message: "Location is required" },
       salary: { value: salary, message: "Salary is required" },
+      experience: {value: experience, message:"Experience is Required"},
       jobtype: { value: jobtype, message: "Job type is required" },
       description: {
         value: description.current?.value,
@@ -99,6 +101,7 @@ const RecruiterHome = () => {
       setCompany("");
       setLocation("");
       setSalary("");
+      setExperience("");
       setJobtype("");
       if (description.current) description.current.value = "";
       setTimeout(() => {
@@ -165,7 +168,6 @@ const RecruiterHome = () => {
               seterror(null);
             }}
           />
-          <div className="flex flex-row gap-2">
             <input
               type="text"
               name="salary"
@@ -177,10 +179,11 @@ const RecruiterHome = () => {
                 seterror(null);
               }}
             />
+          <div className="flex flex-row gap-2 w-full">
             <select
-              name="jobType"
+              name="jobtype"
               id="jobType"
-              className="form-input"
+              className="form-input flex-1/2"
               value={jobtype}
               onChange={(e) => {
                 setJobtype(e.target.value);
@@ -188,12 +191,30 @@ const RecruiterHome = () => {
               }}
             >
               <option value="" disabled>
-                Select
+                Job type
               </option>
               <option value="Full-time">Full-time</option>
               <option value="Part-time">Part-time</option>
               <option value="Contract">Contract</option>
               <option value="Internship">Internship</option>
+            </select>
+            <select
+              name="experience"
+              id="exp"
+              className="form-input flex-1/2"
+              value={experience}
+              onChange={(e) => {
+                setExperience(e.target.value);
+                seterror(null);
+              }}
+            >
+              <option value="" disabled>
+                Experience
+              </option>
+              <option value="Fresher">Fresher (0-2)</option>
+              <option value="Experience (1-2)">1-2</option>
+              <option value="Experience (2-4)">2-4</option>
+              <option value="Experience (4+)">4+</option>
             </select>
           </div>
           <textarea

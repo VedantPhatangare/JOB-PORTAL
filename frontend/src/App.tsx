@@ -5,7 +5,7 @@ import Navbar from './Components/Navbar/Navbar'
 function App() {
 
   return (
-    <div className='relative flex flex-col items-center w-full min-h-[100vh] bg-neutral-100'>
+    <div className='relative flex flex-col w-full min-h-[100vh] bg-gray-50'>
       <Navbar/>
       <Outlet/>
     </div>

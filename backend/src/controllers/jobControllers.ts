@@ -5,12 +5,13 @@ import User from "../models/user.model.js";
 
 export const createJob = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
         console.log(req.body)
-        const {title,description,company,location,salary,jobtype} = req.body
+        const {title,description,company,location,salary,experience,jobtype} = req.body
+        const companyLogo = req.file?.path
         const id= req.user?.id
         const user = await User.findOne({_id:id})
         if(user){
                 const {name,_id:id} = user
-                const job = new Job({title,description,company,location,salary,jobtype,postedBy:{name,id}})
+                const job = new Job({title,description,company,companyLogo,location,experience,salary,jobtype,postedBy:{name,id}})
                 await job.save();
                 return res.status(201).json({message:"Job created successfully", job});
         }
