@@ -12,16 +12,17 @@ const generateTokens = (id: string, role: string) => {
 };
 
 const setCookies = (res: Response, accessToken: string, refreshToken: string) => {
+  const isProduction = process.env.NODE_ENV === "production";
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 15 * 60 * 1000, // 15 mins
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
@@ -93,8 +94,10 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response, next:
     await User.findByIdAndUpdate(req.user.id, { $unset: { refreshToken: 1 } });
   }
 
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  const isProduction = process.env.NODE_ENV === "production";
+  const cookieOptions = { httpOnly: true, secure: isProduction, sameSite: (isProduction ? "none" : "lax") as "none" | "lax" };
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
 
   res.status(200).json({
     success: true,
