@@ -6,6 +6,7 @@ interface userType extends Document{
   email: string,
   password: string,
   role: "Candidate" | "Recruiter",
+  refreshToken?: string,
   appliedJobs: Array<{job_id:string}>,
   postedJobs: Array<{job_id:string}>
 }
@@ -31,6 +32,9 @@ const userSchema:Schema<userType> = new mongoose.Schema(
         enum:["Candidate","Recruiter"],
         default: "Candidate",
         required: true
+      },
+      refreshToken: {
+        type: String,
       },
       appliedJobs:
       [{

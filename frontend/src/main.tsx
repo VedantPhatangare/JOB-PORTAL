@@ -19,6 +19,7 @@ const Applications = lazy(() => import("./pages/Applications"));
 const JobDescription = lazy(
   () => import("./Components/JobDescription/JobDescription")
 );
+const CandidateApplications = lazy(() => import("./pages/CandidateApplications"));
 import { Provider } from "react-redux";
 import store, { persistor } from "./app/Store";
 import { PersistGate } from "redux-persist/integration/react";
@@ -66,15 +67,23 @@ const Router = createBrowserRouter([
         )
       },
       {
-        path:"/applicantions/:job_id",
-        element:(
-          <Suspense>
-            <Applications/>
+        path: "/applications/:job_id",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <Applications />
           </Suspense>
-        )
-      }
-    ]
-  }
+        ),
+      },
+      {
+        path: "/candidate/applied",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <CandidateApplications />
+          </Suspense>
+        ),
+      },
+    ],
+  },
 ]);
 
 createRoot(document.getElementById("root")!).render(

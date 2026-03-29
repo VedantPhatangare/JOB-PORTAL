@@ -1,131 +1,178 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import axios from "axios";
 import { useDispatch } from "react-redux";
-import { login } from "../features/Authslice";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { setCredentials } from "../features/Authslice";
+import { loginService } from "../api/services";
+import { loginSchema, LoginFormValues } from "../validations/auth";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { Briefcase, Mail, Lock, Loader2, User } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
-  const [loader, setloader] = useState<boolean>(false);
-  const role = (searchParams.get("role") as "Recruiter") || "Candidate";
-  const [form, setform] = useState({ email: "", password: "" });
-  const [error, seterror] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setform((prev) => ({ ...prev, [name]: value }));
-  };
- 
+  const defaultRole = (searchParams.get("role") as "Recruiter" | "Candidate") || "Candidate";
   
-  const handlelogin = async (
-    e: React.FormEvent<HTMLFormElement>,
-    role: "Recruiter" | "Candidate"
-  ) => {
-    e.preventDefault();
-    setloader(true);
+  const [selectedRole, setSelectedRole] = useState<"Candidate" | "Recruiter">(defaultRole);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      role: defaultRole,
+    }
+  });
+
+  // Sync state cleanly if manual route changes
+  useEffect(() => {
+    setValue("role", selectedRole);
+  }, [selectedRole, setValue]);
+
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsSubmitting(true);
     try {
-      let response = await axios.post("http://127.0.0.1:5000/api/auth/login", {
-        ...form,
-        role,
-      });
-      if (role=="Recruiter") {
-        const { rec_id } = response.data;
-        navigate(`/recruiterhome?id=${rec_id}`);
-        dispatch(login({role:"Recruiter",id:rec_id}));
+      const payload = { ...data, role: selectedRole };
+      const response = await loginService(payload);
+
+      if (response.success && response.user) {
+        toast.success(`Welcome back, ${response.user.name}!`);
+        dispatch(setCredentials(response.user));
+        
+        if (response.user.role === "Recruiter") {
+          navigate(`/recruiterhome?id=${response.user.id}`);
+        } else {
+          navigate("/");
+        }
       } else {
-        const { user_id } = response.data;
-        dispatch(login({role:"Candidate",id:user_id}));
-        navigate("/");
+         toast.error(response.message || "Failed to login");
       }
-      setloader(false);
-      console.log(response.data);
-      const { token } = response.data;
-      localStorage.setItem("token", token);
-      setform({ email: "", password: "" });
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.response?.data.message || "error occured");
-        seterror(error.response?.data.message || "error occured");
-        setloader(false);
-      } else {
-        console.log("Unexpected error:", error);
-        setform({ email: "", password: "" });
-        setloader(false);
-      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Invalid credentials or wrong role selected.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="relative w-full h-[90vh] z-10">
-      {loader && (
-        <div className="absolute z-10 h-full w-full flex justify-center items-center">
-          <div className="absolute h-full w-full bg-blue-200 opacity-20"></div>
-          <div className="relative z-20 bottom-18 w-14 h-14 border-4 rounded-full border-t-transparent border-b-transparent border-blue-500 animate-spin"></div>
-        </div>
-      )}
-      <div className=" h-[64vh] w-[25vw] mt-[10vh] m-auto rounded-sm bg-white shadow-sm hover:shadow-none transition-all flex flex-col items-center p-2">
-        <div className="mb-10 mt-4 text-2xl font-semibold tracking-wider">
-          {role == "Recruiter" ? "Recruiter Login" : "Candidate Login"}
-        </div>
-        <form
-          action=""
-          onSubmit={(e) => handlelogin(e, role)}
-          className="relative w-[80%] flex flex-col gap-4 items-center mb-6"
-        >
-          <div className="w-72 flex flex-col gap-6 items-center">
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full form-input"
-              placeholder="email"
-            />
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full form-input"
-              placeholder="password"
-            />
+    <div className="min-h-[92vh] flex items-center justify-center bg-[#fafafa] p-4 relative overflow-hidden">
+      {/* Decorative background blur */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-200/40 rounded-full blur-3xl -z-10 mix-blend-multiply"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-200/40 rounded-full blur-3xl -z-10 mix-blend-multiply"></div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-8"
+      >
+        <div className="flex flex-col items-center mb-8">
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-inner ${selectedRole === "Recruiter" ? "bg-purple-50 text-purple-600" : "bg-primary-50 text-primary-600"}`}>
+            {selectedRole === "Recruiter" ? <Briefcase size={32} /> : <User size={32} />}
           </div>
-          {error ? (
-            <div className="text-red-500 text-sm absolute top-28 left-0">
-              {error}
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+            {selectedRole === "Recruiter" ? "Recruiter Login" : "Candidate Login"}
+          </h2>
+          <p className="text-sm text-gray-500 mt-2 text-center">
+            Welcome back! Please enter your details to continue.
+          </p>
+        </div>
+
+        {/* Role Toggle */}
+        <div className="flex bg-gray-100 p-1 rounded-xl mb-6 shadow-inner">
+           <button
+             type="button"
+             onClick={() => setSelectedRole("Candidate")}
+             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+               selectedRole === "Candidate" 
+                 ? "bg-white text-primary-600 shadow-sm" 
+                 : "text-gray-500 hover:text-gray-700"
+             }`}
+           >
+             Candidate
+           </button>
+           <button
+             type="button"
+             onClick={() => setSelectedRole("Recruiter")}
+             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+               selectedRole === "Recruiter" 
+                 ? "bg-white text-purple-600 shadow-sm" 
+                 : "text-gray-500 hover:text-gray-700"
+             }`}
+           >
+             Recruiter
+           </button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+           
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Email Address</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail size={18} className="text-gray-400" />
+              </div>
+              <input
+                type="email"
+                {...register("email")}
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50/50 border ${errors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-primary-500 focus:border-primary-500'} rounded-xl text-sm transition-all focus:bg-white`}
+                placeholder="you@example.com"
+              />
             </div>
-          ) : (
-            ""
-          )}
-          <span className="self-end mt-3 text-blue-500 cursor-pointer">
-            forgot password?
-          </span>
+            {errors.email && <p className="mt-1.5 text-xs text-red-500 ml-1">{errors.email.message}</p>}
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1.5 px-1">
+               <label className="block text-sm font-medium text-gray-700">Password</label>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock size={18} className="text-gray-400" />
+              </div>
+              <input
+                type="password"
+                {...register("password")}
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50/50 border ${errors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-primary-500 focus:border-primary-500'} rounded-xl text-sm transition-all focus:bg-white`}
+                placeholder="••••••••"
+              />
+            </div>
+            {errors.password && <p className="mt-1.5 text-xs text-red-500 ml-1">{errors.password.message}</p>}
+          </div>
+
           <button
             type="submit"
-            className={`${
-              role === "Recruiter" ? " bg-purple-500" : "bg-blue-500"
-            } w-full  text-white font-semibold tracking-wide px-8 py-2.5 rounded-full cursor-pointer transition-colors duration-400 hover:bg-black`}
+            disabled={isSubmitting}
+            className={`w-full flex items-center justify-center py-3 px-4 mt-8 rounded-xl text-white text-sm font-semibold shadow-md transition-all ${
+              selectedRole === "Recruiter" 
+                ? "bg-purple-600 hover:bg-purple-700 hover:shadow-purple-500/25" 
+                : "bg-primary-600 hover:bg-primary-700 hover:shadow-primary-500/25"
+            } disabled:opacity-70 disabled:cursor-not-allowed`}
           >
-            Login
+            {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Sign in to account"}
           </button>
         </form>
-        <div className="mb-4">
+
+        <div className="mt-8 text-center text-sm text-gray-500">
           Don't have an account?{" "}
           <span
-            className="text-blue-500 cursor-pointer"
-            onClick={() => {
-              role=== "Recruiter"? navigate("/signup?role=Recruiter"): navigate("/signup?role=Candidate");
-            }}
+            className="font-semibold text-primary-600 hover:text-primary-700 cursor-pointer"
+            onClick={() => navigate(`/signup?role=${selectedRole}`)}
           >
-            SignUp
+            Sign up now
           </span>
         </div>
-        <span>or</span>
-      </div>
+      </motion.div>
     </div>
   );
 };

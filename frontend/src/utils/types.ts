@@ -1,3 +1,27 @@
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: "Candidate" | "Recruiter";
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+  role?: "Candidate" | "Recruiter";
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: "Candidate" | "Recruiter";
+  };
+}
+
 export interface JobcardProps {
     _id: string, 
     title: string;

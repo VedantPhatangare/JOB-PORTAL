@@ -1,16 +1,18 @@
-import express,{Router} from "express";
-import { apply, getApplicant, getApplicants, HireCandidate } from "../controllers/applicationControllers.js";
+import express, { Router } from "express";
+import { apply, getApplicant, getApplicants, HireCandidate, getAppliedJobs } from "../controllers/applicationControllers.js";
 import jwtVerify from "../middlewares/authMiddleware.js";
 import Fileupload from "../middlewares/multerMiddleware.js";
 
-const applicationRouter:Router = express.Router();
+const applicationRouter: Router = express.Router();
 
-applicationRouter.post('/:job_id/apply',jwtVerify,Fileupload.fields([
-    {name:"resume",maxCount:1},{name:"coverletter",maxCount:1}
-]),apply);
+applicationRouter.post("/:job_id/apply", jwtVerify, Fileupload.fields([
+  { name: "resume", maxCount: 1 }, { name: "coverletter", maxCount: 1 }
+]), apply);
 
-applicationRouter.get('/:job_id/getApplicants',getApplicants)
-applicationRouter.post('/getApplicant',getApplicant)
-applicationRouter.post('/:applicant_id/decision',jwtVerify,HireCandidate)
+applicationRouter.get("/:job_id/getApplicants", getApplicants);
+applicationRouter.post("/getApplicant", getApplicant);
+applicationRouter.post("/:applicant_id/decision", jwtVerify, HireCandidate);
+
+applicationRouter.get("/candidate/applied", jwtVerify, getAppliedJobs);
 
 export default applicationRouter;

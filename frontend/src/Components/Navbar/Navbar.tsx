@@ -1,248 +1,163 @@
-import { IoIosSearch } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/Store";
 import { logout } from "../../features/Authslice";
-import { IoIosPeople } from "react-icons/io";
-import React, { useEffect, useRef, useState } from "react";
-import { FaAngleRight } from "react-icons/fa";
+import { logoutService } from "../../api/services";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, ChevronDown, Briefcase, LogOut, User } from "lucide-react";
+import { toast } from "react-toastify";
+
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [placeholder, setplaceholder] = useState("openings...");
-  const [isTransitioning, setisTransitioning] = useState(false);
-  const [searchtext, setsearchtext] = useState("")
-  const loginRef = useRef<HTMLDivElement>(null);
-  const logoutRef = useRef<HTMLDivElement>(null);
-  const placeholders = ["jobs...", "roles...", "openings..."];
-  const [loginDropDown, setloginDropDown] = useState(false);
-  const [logoutDropDown, setlogoutDropDown] = useState(false);
-  const [showBtn, setshowBtn] = useState(false);
-  const userInfo = useSelector((state: RootState) => {
-    return { isLoggedin: state.auth.isAuthenticated, role: state.auth.role };
-  });
-  const navRef = useRef<HTMLDivElement>(null)
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    dispatch(logout());
-    if(userInfo.role=="Recruiter") navigate("/login?role=Recruiter");else navigate("/login");
-  };
-  const delayAnim = () => {
-    const ref: {refElement:React.RefObject<HTMLDivElement | null>, setFunction:React.Dispatch<React.SetStateAction<boolean>>} = loginRef.current? {refElement:loginRef, setFunction:setloginDropDown}: {refElement:logoutRef, setFunction:setlogoutDropDown} ;
-    setTimeout(() => {
-      if (ref.refElement.current) ref.refElement.current.classList.remove("slide-up");
-      ref.setFunction(false);
-    }, 200);
-  };
-  useEffect(() => {
-    let index = 0;
-    const intervalId = setInterval(() => {
-      setisTransitioning(true);
-      setTimeout(() => {
-        setplaceholder(placeholders[index]);
-        index = (index + 1) % placeholders.length;
-        setisTransitioning(false);
-      }, 300);
-    }, 3000);
+  const [scrolled, setScrolled] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
 
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
-    const handleHideRef = (e: MouseEvent) => {
-      const refElement: React.RefObject<HTMLDivElement | null> = loginRef.current? loginRef: logoutRef ;
-      const target = e.target as HTMLElement;
-      if(refElement == loginRef){
-          if (
-            refElement.current &&
-            !refElement.current.contains(target) &&
-            !target.classList.contains("keep-open")
-          ) {
-            refElement.current.classList.add("slide-up");
-            delayAnim();
-          }
-      }else{
-        if (
-          refElement.current &&
-          !refElement.current.contains(target)
-        ) {
-          refElement.current.classList.add("slide-right");
-          delayAnim();
-        }
-      }
-    };
-    document.addEventListener("mousedown", handleHideRef);
-    return () => document.removeEventListener("mousedown", handleHideRef);
-  }, []);
+  const userInfo = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (navRef.current){
-        if (window.scrollY > 20) {
-          const maxsroll = 100;
-          const scrollPosition = window.scrollY;
-          let brightnessFactor = Math.max(0,1-scrollPosition/maxsroll);
-          navRef.current.style.background = `linear-gradient(to bottom, rgba(255, 255, 255, ${brightnessFactor * 0.5}), rgba(255, 255, 255, ${brightnessFactor})) 0% 0% / cover, linear-gradient(to bottom, #bcc3cd, #f3f4f6)`;
-          navRef.current.style.opacity = "1";
-        } else {
-          navRef.current.style.background = "bg-neutral-100";
-        }
-      }
+      setScrolled(window.scrollY > 20);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutService();
+      dispatch(logout());
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch (error) {
+      toast.error("Logout failed");
+    }
+  };
+
   return (
-    <nav 
-    ref={navRef} 
-    className="sticky top-0 h-[8vh] z-30 w-full flex items-center justify-between p-2 transition-all">
-      <div
-        className="logo w-[15%] text-center p-6 cursor-pointer flex justify-center items-center gap-2"
-        onClick={() => {
-          navigate("/");
-          setshowBtn((prev)=>!prev? !prev: prev);
-        }}  
-      >
-        <IoIosPeople className="text-2xl" />
-        <p className="text-xl font-semibold tracking-wider">
-          Get<span className="text-blue-400">Hire</span>d
-        </p>
-      </div>
-      <div className="flex w-[50%] h-[90%] bg-blue-50 rounded-4xl py-1 px-2">
-        <IoIosSearch className="h-full w-[3%]" />
-        <input
-          type="text"
-          placeholder={`Search for ${placeholder}`}
-          value={searchtext}
-          onChange={(e)=>setsearchtext(e.target.value)}
-          className={`search_input ${
-            searchtext? "": isTransitioning? "fade-out" : "fade-in"
-          } `}
-        />
-      </div>
-      <div className="buttons w-[25%]">
-        {userInfo.isLoggedin ? (
-          <div className="relative flex flex-row gap-8 w-full justify-end items-center">
-            {userInfo.role == "Candidate" ? (
-              <div></div>
-            ) : userInfo.role == "Recruiter" && showBtn==true ? (
-              <button
-                className="py-2 px-4 h-[95%] rounded-sm flex justify-center items-center text-sm tracking-wide cursor-pointer font-medium transition-all duration-300 hover:bg-black hover:text-white border-none bg-purple-100"
-                onClick={() => {
-                  navigate("/recruiterhome");
-                  setshowBtn(false);
-                }}
-              >
-                Recruiter Home
-              </button>
-            ) : (
-              ""
-            )}
-            <button
-              onClick={() => {
-                setlogoutDropDown((prev) => !prev);
-                // handleLogout()
-              }}
-              className={`bg-gray-800 py-1.5 px-4 h-[95%] rounded-sm flex justify-center items-center text-white tracking-wide font-medium cursor-pointer transition-all duration-300 hover:bg-black justify-self-end ${
-                logoutDropDown ? "hidden" : "visible"
-              }`}
-            >
-              Logout
-            </button>
-            {logoutDropDown ? (
-              <div 
-              ref={logoutRef}
-              className="slide-left absolute z-20 bg-gray-800 text-white flex flex-row gap-6 left-0 justify-center items-center rounded-md w-full  transition-all">
-                <p className="text-sm font-semibold tracking-wider">Confirm choice</p>
-                <div className="flex flex-row gap-6 justify-center items-center rounded-lg py-2">
-                  <button 
-                  onClick={()=>{
-                    setlogoutDropDown(false);
-                    handleLogout()}}
-                  className="py-1 px-4 tracking-wide rounded-md flex  justify-center items-center text-md hover:text-white text-gray-800 cursor-pointer  bg-white transition-all duration-400 hover:bg-red-700">
-                    Logout
-                  </button>
-                  <button 
-                  onClick={()=>{
-                      logoutRef.current?.classList.add("slide-right");
-                      delayAnim()}
-                    }
-                  
-                  className="bg-blue-500 py-1 px-6 tracking-wide rounded-sm flex justify-center items-center text-white text-md  cursor-pointer  transition-all hover:bg-sky-600">
-                    Stay
+    <nav
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled ? "glass-morphism py-3" : "bg-transparent py-4"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        
+        {/* LOGO */}
+        <div
+          className="flex items-center gap-2 cursor-pointer group"
+          onClick={() => navigate("/")}
+        >
+          <div className="bg-primary-600 text-white p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-md shadow-primary-500/30">
+            <Briefcase size={24} />
+          </div>
+          <span className="text-2xl font-bold tracking-tight text-gray-900">
+            Get<span className="text-primary-600">Hired</span>
+          </span>
+        </div>
+
+        {/* SEARCH BAR (Only on non-auth pages) */}
+        {!location.pathname.includes("login") && !location.pathname.includes("signup") && (
+          <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search size={18} className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search for jobs, roles, companies..."
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 border border-gray-200/50 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-inner"
+            />
+          </div>
+        )}
+
+        {/* ACTIONS & AUTH */}
+        <div className="flex items-center gap-4">
+          {userInfo.isAuthenticated ? (
+            <div className="flex items-center gap-4">
+              {userInfo.role === "Recruiter" && (
+                <button
+                  onClick={() => navigate("/recruiterhome")}
+                  className="hidden md:flex items-center gap-2 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-full transition-colors"
+                >
+               Recruiter Dashboard
+                </button>
+              )}
+               {userInfo.role === "Candidate" && (
+                <button
+                  onClick={() => navigate("/candidate/applied")}
+                  className="hidden md:flex items-center gap-2 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-full transition-colors"
+                >
+                 My Applications
+                </button>
+              )}
+
+              <div className="relative group">
+                <button className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                  <div className="w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
+                    {userInfo.name?.charAt(0).toUpperCase() || <User size={18} />}
+                  </div>
+                </button>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50 overflow-hidden">
+                   <div className="px-4 py-3 border-b border-gray-50">
+                     <p className="text-sm font-medium text-gray-900 truncate">{userInfo.name}</p>
+                     <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                   </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                  >
+                    <LogOut size={16} /> Logout
                   </button>
                 </div>
               </div>
-            ) : (
-              ""
-            )}
-          </div>
-        ) : (
-          <div className="relative flex gap-6 w-full items-center justify-center">
-            <button
-              onClick={() => navigate("/signup?role=")}
-              className="py-1.5 px-3 h-[95%] tracking-wide rounded-sm flex justify-center items-center cursor-pointer text-black font-medium transition-all duration-300"
-            >
-              SignUp
-            </button>
-            <button
-              onMouseOver={() => setloginDropDown(!loginDropDown)}
-              onClick={() => {
-                if (!loginDropDown) {
-                  setloginDropDown((prev) => !prev);
-                } else {
-                  if (loginRef.current)
-                    loginRef.current.classList.add("slide-up");
-                  delayAnim();
-                }
-              }}
-              className="bg-black py-1.5 px-4 tracking-wide rounded-sm flex justify-center items-center gap-2 text-white font-medium cursor-pointer hover:bg-gray-800 transition-color duration-300 keep-open"
-            >
-              Login{" "}
-              <FaAngleRight
-                className={`transition-all duration-200 ${
-                  loginDropDown ? "rotate-90 " : ""
-                }`}
-              />
-            </button>
-            {loginDropDown && (
-              <div
-                ref={loginRef}
-                className={`absolute  flex flex-wrap justify-center items-center gap-2 top-12 left-20 px-4 pb-4 bg-gray-50 py-2 border border-gray-100 slide-down`}
-                onMouseLeave={() => {
-                  if (loginRef.current)
-                    loginRef.current.classList.add("slide-up");
-                  delayAnim();
-                }}
-              >
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="relative" onMouseLeave={() => setLoginDropdownOpen(false)}>
                 <button
-                  onClick={() => {
-                    navigate("/login?role=Recruiter");
-                    if (loginRef.current)
-                      loginRef.current.classList.add("slide-up");
-                    delayAnim();
-                  }}
-                  className="py-1.5 px-2 tracking-wide rounded-sm flex justify-center items-center text-md cursor-pointer border border-gray-200  bg-gray-100 transition-all duration-400 hover:bg-gray-800 hover:text-white"
+                  onMouseEnter={() => setLoginDropdownOpen(true)}
+                  className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-2 transition-colors"
                 >
-                  Recruiter
+                  Log in <ChevronDown size={16} className={`transition-transform ${loginDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
-                <button
-                  onClick={() => {
-                    navigate("/login");
-                    if (loginRef.current)
-                      loginRef.current.classList.add("slide-up");
-                    delayAnim();
-                  }}
-                  className="bg-black py-1.5 px-2 tracking-wide rounded-sm flex justify-center items-center text-white text-md cursor-pointer hover:bg-gray-800 transition-color duration-300"
-                >
-                  Candidate
-                </button>
+                
+                <AnimatePresence>
+                  {loginDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-full mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    >
+                      <button
+                        onClick={() => { navigate("/login"); setLoginDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      >
+                        As Candidate
+                      </button>
+                      <button
+                        onClick={() => { navigate("/login?role=Recruiter"); setLoginDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors border-t border-gray-50"
+                      >
+                        As Recruiter
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            )}
-          </div>
-        )}
+
+              <button
+                onClick={() => navigate("/signup")}
+                className="bg-gray-900 hover:bg-black text-white px-5 py-2 rounded-full text-sm font-medium shadow-md transition-all hover:-translate-y-0.5"
+              >
+                Sign up
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

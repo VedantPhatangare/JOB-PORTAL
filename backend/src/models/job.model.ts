@@ -3,6 +3,7 @@ import mongoose, { Date, Document,Schema } from "mongoose";
 interface jobType extends Document{
   title: string,
   description: string,
+  category: string,
   company: string,
   companyLogo?: string,
   location: string,
@@ -24,7 +25,11 @@ const jobSchema:Schema<jobType> = new mongoose.Schema(
         description:{
             type: String,
             required: true
-        },  
+        },
+        category:{
+            type: String,
+            required: true
+        },
         company:{
             type: String,
             required: true

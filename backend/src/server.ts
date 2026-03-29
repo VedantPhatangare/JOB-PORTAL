@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRoutes.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import dbConnection from "./config/db.js";
@@ -17,8 +18,12 @@ const resumePath = path.join(__dirnam,"../uploads");
 // console.log(resumePath);
 
 // middlewares
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // Vite default port
+  credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.use('/getresume/', express.static(resumePath))
 

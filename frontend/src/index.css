@@ -1,137 +1,49 @@
 @import "tailwindcss";
 
-/* styles.css */
+@theme {
+  --font-sans: "Inter", "system-ui", "sans-serif";
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #fafafa;
+  color: #111827;
+}
+
+button, 
+[role="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  cursor: pointer;
+}
+
 .input-style {
-  @apply p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer;
+  @apply p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 hover:border-gray-400 transition-all bg-white;
 }
 
-.form-input{
-  @apply border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400 p-2 transition-all hover:bg-sky-50
-}
-.selectinput-nohover{
-  @apply border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400 p-2 transition-all cursor-pointer
+.form-input {
+  @apply w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 bg-white placeholder-gray-400 text-sm p-3 transition-all hover:border-gray-400;
 }
 
-.form-select{
-  @apply border border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all hover:bg-blue-50
+.form-select {
+  @apply w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 bg-white transition-all cursor-pointer hover:border-gray-400;
 }
 
-.flash {
-  animation: flashAnim 0.5s ease-in-out;
-}
-.flashInput {
-  animation: flashBorder 0.5s ease-in-out;
+.glass-morphism {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm shadow-blue-900/5;
 }
 
-@keyframes flashAnim {
-  0% {
-    background-color: inherit;
-  }
-  50% {
-    background-color: #ffc0cb;
-  }
-  100% {
-    background-color: inherit;
-  }
-}
-@keyframes flashBorder {
-  0% {
-    border-color: pink;
-    
-  }
-  50% {
-    border-color: red;
-    border-width: 1.5px;
-    
-  }
-  100% {
-    border-color: pink;
-  }
-}
-
-.search_input{
-  @apply h-full w-[97%] outline-none text-sm tracking-wider p-2 ;
-}
-
-
-@keyframes Fadeup {
-  from{
-    transform: translateY(0px);
-    opacity: 1;
-    
-  }to{
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-@keyframes FadeDown {
-  from{
-    transform: translateY(10px);
-    opacity: 0;
-    
-  }to{
-    opacity: 1;
-    transform: translateY(0px);
-  }
-}
-.fade-out {
-  animation: Fadeup 0.5s ease-out forwards;
-}
-
-.fade-in {
-  animation: FadeDown 0.4s ease-in forwards;
-}
-
-@keyframes slideDown {
-  from{
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to{
-    opacity: 1;
-    transform: translateY(0px);
-  }
-}
-@keyframes slideUp {
-  from{
-    opacity: 1;
-    transform: translateY(0px);
-  }
-  to{
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-@keyframes slideLeft {
-  from{
-    opacity: 0;
-    transform: translateX(0px);
-  }
-  to{
-    opacity: 1;
-    transform: translateX(-10px);
-  }
-}
-@keyframes slideRight {
-  from{
-    opacity: 1;
-    transform: translateX(-10px);
-  }
-  to{
-    opacity: 0;
-    transform: translateX(0px);
-  }
-}
-
-.slide-down{
-  animation: slideDown 0.2s ease-out forwards;
-}
-.slide-up{
-  animation: slideUp 0.2s ease-in forwards;
-}
-.slide-left{
-  animation: slideLeft 0.2s ease-out forwards;
-}
-.slide-right{
-  animation: slideRight 0.2s ease-in forwards;
+.search_input {
+  @apply h-full w-[97%] outline-none text-sm tracking-wide p-2 bg-transparent text-gray-800;
 }

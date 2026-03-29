@@ -1,33 +1,44 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
-    isAuthenticated: boolean;
-    role:"Candidate" | "Recruiter" |"",
-    id:string
+  isAuthenticated: boolean;
+  role: "Candidate" | "Recruiter" | "";
+  id: string;
+  name: string;
+  email: string;
 }
 
 const initialState: AuthState = {
-    isAuthenticated: false,
-    role: "",
-    id:""
-}
+  isAuthenticated: false,
+  role: "",
+  id: "",
+  name: "",
+  email: "",
+};
 
-export const AuthSlice= createSlice({
-    name:"Auth",
-    initialState,
-    reducers:{
-        login(state, action:PayloadAction<{role:"Candidate" | "Recruiter",id:string}>){
-            state.isAuthenticated = true;
-            state.role = action.payload.role;
-            state.id = action.payload.id;
-        },
-        logout(state){
-            state.isAuthenticated = false;
-            state.id= ""
-            state.role = ""
-        }
-    }
-})
+export const AuthSlice = createSlice({
+  name: "Auth",
+  initialState,
+  reducers: {
+    setCredentials(
+      state,
+      action: PayloadAction<{ id: string; role: "Candidate" | "Recruiter"; name: string; email: string }>
+    ) {
+      state.isAuthenticated = true;
+      state.id = action.payload.id;
+      state.role = action.payload.role;
+      state.name = action.payload.name;
+      state.email = action.payload.email;
+    },
+    logout(state) {
+      state.isAuthenticated = false;
+      state.id = "";
+      state.role = "";
+      state.name = "";
+      state.email = "";
+    },
+  },
+});
 
-export const {login,logout} = AuthSlice.actions;
+export const { setCredentials, logout } = AuthSlice.actions;
 export default AuthSlice.reducer;
