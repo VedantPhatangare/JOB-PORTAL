@@ -37,7 +37,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
   if (allowedExt.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Only pdf, doc, docx files are allowed'), false);
+    cb(new Error('Only pdf, doc, docx files are allowed') as any, false);
   }
 };
 
