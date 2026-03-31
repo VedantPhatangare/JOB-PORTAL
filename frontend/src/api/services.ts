@@ -1,5 +1,5 @@
 import apiClient from "./axiosClient";
-import { RegisterPayload, LoginPayload, AuthResponse } from "../utils/types"; // Need to check if these exist, else will create
+import { RegisterPayload, LoginPayload, AuthResponse } from "../utils/types";
 
 // --- Auth Services ---
 export const registerService = async (data: RegisterPayload) => {
@@ -22,19 +22,39 @@ export const getMeService = async () => {
   return response.data;
 };
 
+export const updateProfileService = async (formData: FormData) => {
+  const response = await apiClient.patch("/auth/profile", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const getPublicProfileService = async (userId: string) => {
+  const response = await apiClient.get(`/auth/profile/${userId}`);
+  return response.data;
+};
+
 // --- Job Services ---
-export const getJobsService = async (filters?: { location?: string; jobtype?: string; category?: string }) => {
+export const getJobsService = async (filters?: { location?: string; jobtype?: string; category?: string; search?: string; minSalary?: string; maxSalary?: string }) => {
   try {
     const params = new URLSearchParams();
     if (filters?.location) params.append("location", filters.location);
     if (filters?.jobtype) params.append("jobtype", filters.jobtype);
     if (filters?.category) params.append("category", filters.category);
+    if (filters?.search) params.append("search", filters.search);
+    if (filters?.minSalary) params.append("minSalary", filters.minSalary);
+    if (filters?.maxSalary) params.append("maxSalary", filters.maxSalary);
 
     const response = await apiClient.get(`/jobs/getjobs?${params.toString()}`);
     return response.data;
   } catch (error) {
     throw error;
   }
+};
+
+export const getRecommendedJobsService = async () => {
+  const response = await apiClient.get("/jobs/recommended");
+  return response.data;
 };
 
 export const getCategoriesService = async () => {
@@ -44,6 +64,16 @@ export const getCategoriesService = async () => {
   } catch (error) {
     throw error;
   }
+};
+
+export const toggleBookmarkJobService = async (jobId: string) => {
+  const response = await apiClient.post(`/jobs/bookmark/${jobId}`);
+  return response.data;
+};
+
+export const getSavedJobsService = async () => {
+  const response = await apiClient.get("/jobs/saved");
+  return response.data;
 };
 
 export const createJobService = async (formData: FormData) => {
@@ -59,6 +89,16 @@ export const deleteJobService = async (id: string) => {
   const response = await apiClient.delete("/jobs/deletejob", { data: { id } });
   return response.data;
 };
+
+export const updateJobService = async (id: string, formData: FormData) => {
+  const response = await apiClient.put(`/jobs/update/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
 
 // --- Application Services ---
 export const applyForJobService = async (jobId: string, formData: FormData) => {
@@ -87,5 +127,10 @@ export const makeHiringDecisionService = async (applicantId: string, jobId: stri
 
 export const getCandidateAppliedJobsService = async () => {
   const response = await apiClient.get("/application/candidate/applied");
+  return response.data;
+};
+
+export const withdrawApplicationService = async (jobId: string) => {
+  const response = await apiClient.delete(`/application/${jobId}/withdraw`);
   return response.data;
 };

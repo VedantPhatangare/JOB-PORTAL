@@ -42,9 +42,11 @@ function App() {
   }
 
   return (
-    <div className="relative flex flex-col w-full min-h-[100vh] bg-gray-50 font-sans text-gray-900">
+    <div className="relative flex flex-col w-full h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">
       <Navbar />
-      <Outlet />
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        <Outlet />
+      </div>
       <ToastContainer position="bottom-right" theme="colored" autoClose={3000} />
     </div>
   );

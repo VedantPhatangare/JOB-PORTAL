@@ -6,9 +6,14 @@ import { setJobs } from "../../features/Jobslice";
 import { useNavigate } from "react-router-dom";
 import { deleteJobService, getApplicantsService } from "../../api/services";
 import { toast } from "react-toastify";
-import { MapPin, Briefcase, IndianRupee, Clock, Users, Trash2, ArrowRight } from "lucide-react";
+import { MapPin, Briefcase, IndianRupee, Clock, Users, Trash2, ArrowRight, Edit3, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+
+interface RecruiterJobCardProps extends JobcardProps {
+  onEdit: () => void;
+}
+
 
 function JobpostCard({
   _id,
@@ -18,7 +23,9 @@ function JobpostCard({
   salary,
   jobtype,
   createdAt,
-}: JobcardProps): React.ReactElement {
+  onEdit,
+}: RecruiterJobCardProps): React.ReactElement {
+
 
   const [applicantCount, setApplicantCount] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -67,27 +74,48 @@ function JobpostCard({
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col h-full group relative overflow-hidden"
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-150 ease-out will-change-transform flex flex-col h-full group relative overflow-hidden"
     >
-      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full pointer-events-none opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full pointer-events-none opacity-50"></div>
       
       <div className="flex justify-between items-start mb-3 relative">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary-50 text-primary-700 text-xs font-bold rounded-lg mb-2">
           <Briefcase size={12} /> {jobtype}
         </div>
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-          title="Delete Job"
-        >
-          <Trash2 size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate(`/job/${_id}`)}
+            className="text-gray-400 hover:text-primary-600 p-1.5 rounded-lg hover:bg-primary-50 transition-colors"
+            title="View Details"
+          >
+            <Eye size={16} />
+          </button>
+          <button
+            onClick={onEdit}
+            className="text-gray-400 hover:text-amber-600 p-1.5 rounded-lg hover:bg-amber-50 transition-colors"
+            title="Edit Job"
+          >
+            <Edit3 size={16} />
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+            title="Delete Job"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
 
-      <h2 className="text-lg font-bold text-gray-900 leading-tight mb-1 relative line-clamp-2">
+      <h2 
+        onClick={() => navigate(`/job/${_id}`)}
+        className="text-lg font-bold text-gray-900 leading-tight mb-1 relative line-clamp-2 cursor-pointer hover:text-primary-600 transition-colors"
+      >
         {title}
       </h2>
+
       <p className="text-sm font-medium text-gray-600 mb-4 tracking-tight">
         {company}
       </p>

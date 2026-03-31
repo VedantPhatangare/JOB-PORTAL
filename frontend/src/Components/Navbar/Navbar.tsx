@@ -5,23 +5,65 @@ import { RootState } from "../../app/Store";
 import { logout } from "../../features/Authslice";
 import { logoutService } from "../../api/services";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown, Briefcase, LogOut, User, Menu, X } from "lucide-react";
+import { Search, ChevronDown, Briefcase, LogOut, User, Menu, X, UserCircle, Heart } from "lucide-react";
 import { toast } from "react-toastify";
+import ConfirmationModal from "../ConfirmationModal";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+ 
+  const isAuthPage = location.pathname.includes("login") || location.pathname.includes("signup");
+  const auth = useSelector((state: RootState) => state.auth);
+  const profilePath = auth.role === "Recruiter" ? "/profile/recruiter" : "/profile/candidate";
+
 
   const [scrolled, setScrolled] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const loginDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   const userInfo = useSelector((state: RootState) => state.auth);
+
+  // Sync search input with URL param
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchFromUrl = params.get("search") || "";
+    if (searchQuery !== searchFromUrl) {
+      setSearchQuery(searchFromUrl);
+    }
+  }, [location.search]);
+
+  // Real-time debounced search
+  useEffect(() => {
+    // Skip if we are on auth pages
+    if (isAuthPage) return;
+
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(location.search);
+      const currentUrlSearch = params.get("search") || "";
+      const trimmedQuery = searchQuery.trim();
+
+      // Only navigate if the local state actually differs from URL
+      if (trimmedQuery !== currentUrlSearch) {
+        if (trimmedQuery) {
+          navigate(`/?search=${encodeURIComponent(trimmedQuery)}`, { replace: true });
+        } else if (currentUrlSearch !== "") {
+          navigate("/", { replace: true });
+        }
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, navigate, location.search, isAuthPage]);
+
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -29,7 +71,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (loginDropdownRef.current && !loginDropdownRef.current.contains(e.target as Node)) {
@@ -43,30 +84,51 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setLoginDropdownOpen(false);
     setProfileDropdownOpen(false);
   }, [location.pathname]);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    setLogoutModalOpen(true);
+    setProfileDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await logoutService();
       dispatch(logout());
       toast.success("Logged out successfully");
+      setLogoutModalOpen(false);
       navigate("/login");
     } catch (error) {
       toast.error("Logout failed");
+      setIsLoggingOut(false);
     }
   };
 
-  const isAuthPage = location.pathname.includes("login") || location.pathname.includes("signup");
+  const cancelLogout = () => {
+    setLogoutModalOpen(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      navigate(`/?search=${encodeURIComponent(trimmed)}`);
+    } else {
+      navigate("/");
+    }
+    setMobileMenuOpen(false);
+  };
 
   return (
     <nav
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? "glass-morphism py-3" : "bg-transparent py-4"
+        scrolled ? "bg-white shadow-md border-b border-gray-100" : "bg-white py-0"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
@@ -84,18 +146,29 @@ const Navbar = () => {
           </span>
         </div>
 
-        {/* SEARCH BAR (desktop only, non-auth pages) */}
+        {/* SEARCH BAR (desktop, non-auth pages) */}
         {!isAuthPage && (
-          <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg mx-8 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search size={18} className="text-gray-400" />
             </div>
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for jobs, roles, companies..."
               className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 border border-gray-200/50 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-inner"
             />
-          </div>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => { setSearchQuery(""); navigate("/"); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </form>
         )}
 
         {/* DESKTOP AUTH ACTIONS */}
@@ -107,25 +180,33 @@ const Navbar = () => {
                   onClick={() => navigate("/recruiterhome")}
                   className="flex items-center gap-2 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-full transition-colors"
                 >
-                  Recruiter Dashboard
+                  Dashboard
                 </button>
               )}
               {userInfo.role === "Candidate" && (
-                <button
-                  onClick={() => navigate("/candidate/applied")}
-                  className="flex items-center gap-2 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-full transition-colors"
-                >
-                  My Applications
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigate("/jobs/saved")}
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors px-4 py-2 rounded-full ${location.pathname === "/jobs/saved" ? "bg-red-50 text-red-600 shadow-sm" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    <Heart size={16} fill={location.pathname === "/jobs/saved" ? "currentColor" : "none"} /> Saved
+                  </button>
+                  <button
+                    onClick={() => navigate("/candidate/applied")}
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors px-4 py-2 rounded-full ${location.pathname === "/candidate/applied" ? "bg-primary-50 text-primary-700 shadow-sm" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    My Applications
+                  </button>
+                </div>
               )}
 
-              {/* Profile Dropdown - click-based */}
+              {/* Profile Dropdown */}
               <div className="relative" ref={profileDropdownRef}>
                 <button
                   onClick={() => setProfileDropdownOpen((prev) => !prev)}
                   className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
+                  <div className="w-9 h-9 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
                     {userInfo.name?.charAt(0).toUpperCase() || <User size={18} />}
                   </div>
                   <ChevronDown size={14} className={`text-gray-500 transition-transform ${profileDropdownOpen ? "rotate-180" : ""}`} />
@@ -138,15 +219,22 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 4, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                      className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
                     >
                       <div className="px-4 py-3 border-b border-gray-50">
                         <p className="text-sm font-semibold text-gray-900 truncate">{userInfo.name}</p>
                         <p className="text-xs text-gray-400 truncate">{userInfo.email}</p>
+                        <span className="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-50 text-primary-700">{userInfo.role}</span>
                       </div>
                       <button
+                        onClick={() => { navigate(profilePath); setProfileDropdownOpen(false); }}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <UserCircle size={16} className="text-gray-400" /> My Profile
+                      </button>
+                      <button
                         onClick={() => { handleLogout(); setProfileDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors text-left border-t border-gray-50"
                       >
                         <LogOut size={16} /> Logout
                       </button>
@@ -157,7 +245,7 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              {/* Login Dropdown - click-based */}
+              {/* Login Dropdown */}
               <div className="relative" ref={loginDropdownRef}>
                 <button
                   onClick={() => setLoginDropdownOpen((prev) => !prev)}
@@ -226,23 +314,25 @@ const Navbar = () => {
 
               {/* Mobile Search */}
               {!isAuthPage && (
-                <div className="relative mb-3">
+                <form onSubmit={handleSearch} className="relative mb-3">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search size={16} className="text-gray-400" />
                   </div>
                   <input
                     type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search jobs..."
                     className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
                   />
-                </div>
+                </form>
               )}
 
               {userInfo.isAuthenticated ? (
                 <>
                   {/* User info */}
                   <div className="flex items-center gap-3 px-2 py-3 border-b border-gray-100 mb-2">
-                    <div className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
+                    <div className="w-10 h-10 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
                       {userInfo.name?.charAt(0).toUpperCase() || <User size={16} />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -260,13 +350,27 @@ const Navbar = () => {
                     </button>
                   )}
                   {userInfo.role === "Candidate" && (
-                    <button
-                      onClick={() => navigate("/candidate/applied")}
-                      className="w-full text-left px-3 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors"
-                    >
-                      My Applications
-                    </button>
+                    <div className="flex flex-col gap-1">
+                      <button
+                        onClick={() => navigate("/jobs/saved")}
+                        className={`w-full text-left px-3 py-3 text-sm font-medium rounded-xl transition-colors flex items-center gap-2 ${location.pathname === "/jobs/saved" ? "bg-red-50 text-red-600" : "text-gray-700 hover:bg-gray-50"}`}
+                      >
+                        <Heart size={16} fill={location.pathname === "/jobs/saved" ? "currentColor" : "none"} /> Saved Jobs
+                      </button>
+                      <button
+                        onClick={() => navigate("/candidate/applied")}
+                        className={`w-full text-left px-3 py-3 text-sm font-medium rounded-xl transition-colors ${location.pathname === "/candidate/applied" ? "bg-primary-50 text-primary-700" : "text-gray-700 hover:bg-gray-50"}`}
+                      >
+                        My Applications
+                      </button>
+                    </div>
                   )}
+                  <button
+                    onClick={() => { navigate(profilePath); setMobileMenuOpen(false); }}
+                    className="w-full flex items-center gap-2 px-3 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                  >
+                    <UserCircle size={16} className="text-gray-400" /> My Profile
+                  </button>
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
                     className="w-full flex items-center gap-2 px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
@@ -303,6 +407,20 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={logoutModalOpen}
+        title="Logout"
+        message={`Are you sure you want to logout? You'll need to log in again to access your account.`}
+        confirmText={isLoggingOut ? "Logging out..." : "Logout"}
+        cancelText="Cancel"
+        variant="warning"
+        isDangerous={true}
+        isLoading={isLoggingOut}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
     </nav>
   );
 };

@@ -31,13 +31,23 @@ const storage = new CloudinaryStorage({
 
 // File filter
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-  const allowedExt = ['.pdf', '.doc', '.docx'];
   const ext = path.extname(file.originalname).toLowerCase();
-  
-  if (allowedExt.includes(ext)) {
-    cb(null, true);
+
+  if (file.fieldname === 'profileImage') {
+    const allowedImageExt = ['.jpg', '.jpeg', '.png', '.webp'];
+    if (allowedImageExt.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only jpg, jpeg, png, webp files are allowed for profile images') as any, false);
+    }
   } else {
-    cb(new Error('Only pdf, doc, docx files are allowed') as any, false);
+    // Defaults for resume, coverletter, etc.
+    const allowedDocExt = ['.pdf', '.doc', '.docx'];
+    if (allowedDocExt.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only pdf, doc, docx files are allowed for documents') as any, false);
+    }
   }
 };
 

@@ -11,21 +11,37 @@ export interface LoginPayload {
   role?: "Candidate" | "Recruiter";
 }
 
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: "Candidate" | "Recruiter";
+  // Candidate fields
+  skills: string[];
+  bio: string;
+  profilePhoto: string;
+  resumeUrl: string;
+  experience: string;
+  education: string;
+  // Recruiter fields
+  companyName: string;
+  companyWebsite: string;
+  companyDescription: string;
+  companyLogo: string;
+  savedJobs: string[];
+}
+
 export interface AuthResponse {
   success: boolean;
   message?: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: "Candidate" | "Recruiter";
-  };
+  user?: UserProfile;
 }
 
 export interface JobcardProps {
-    _id: string, 
+    _id: string; 
     title: string;
     description?: string;
+    category?: string;
     company: string;
     companyLogo: string;
     location: string;
@@ -33,7 +49,9 @@ export interface JobcardProps {
     jobtype: string;
     experience: string;
     postedBy: {name:string, id:string};
-    createdAt?:Date
+    createdAt?: Date;
+    skills?: string[];
+    deadline?: string;
   }
 
   export interface jobPostInput{
@@ -57,11 +75,14 @@ export interface JobcardProps {
     applicant_id:{
       email:string,
       name: string,
-      _id: string
+      _id: string,
+      skills?: string[],
+      bio?: string,
     },
-    status:"Pending" | "Accepted" | "Rejected",
+    status:"Pending" | "Shortlisted" | "Accepted" | "Rejected",
     resume:string,
     coverletter?: string,
+    matchScore?: number,
     createdAt: Date
   }
 
@@ -69,10 +90,9 @@ export interface JobcardProps {
 export interface IApplication {
   job_id: string;
   applicant_id: string;
-  status: "Pending" | "Accepted" | "Rejected";
+  status: "Pending" | "Shortlisted" | "Accepted" | "Rejected";
   resume: string;
   coverletter?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
-

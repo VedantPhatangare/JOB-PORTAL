@@ -37,7 +37,7 @@ app.use('/api/application',applicationRouter);
 
 
 // server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 dbConnection()
   .then(() => {

@@ -8,6 +8,7 @@ export const createJobSchema = z.object({
   salary: z.string().min(1, "Salary is required"),
   experience: z.string().min(1, "Experience is required"),
   jobtype: z.string().min(1, "Job type is required"),
+  deadline: z.string().min(1, "Deadline is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
 });
 

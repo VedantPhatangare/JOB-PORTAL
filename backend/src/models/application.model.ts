@@ -14,7 +14,7 @@ const applicationSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Accepted", "Rejected"],
+      enum: ["Pending", "Shortlisted", "Accepted", "Rejected"],
       default: "Pending",
     },
     resume: {
@@ -23,6 +23,10 @@ const applicationSchema = new Schema(
     },
     coverletter: {
       type: String,
+    },
+    matchScore: {
+      type: Number,
+      default: 0,
     },
   },
   {
